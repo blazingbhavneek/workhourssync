@@ -1,9 +1,8 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 
 export default function LoginPage() {
-    // State hooks for user inputs and response
     const [employeeNumber, setEmployeeNumber] = useState('');
     const [password, setPassword] = useState('');
     const [email, setEmail] = useState('');
@@ -11,54 +10,102 @@ export default function LoginPage() {
     const [fingerprintHash, setFingerprintHash] = useState('');
     const [error, setError] = useState('');
     const [otp, setOtp] = useState('');
+    const [otpSent, setOtpSent] = useState(false);
 
-    // Handle form submission
+    // Detect device on component mount
+    useEffect(() => {
+        const userAgent = navigator.userAgent.toLowerCase();
+        if (/mobile|android|touch|webos|iphone|ipad|ipod/.test(userAgent)) {
+            setIsMobile(true);
+            // Simulate fingerprint hash for demo (replace with real fingerprint API if available)
+            setFingerprintHash('simulated-fingerprint-hash-' + Math.random().toString(36).substring(2));
+        } else {
+            setIsMobile(false);
+        }
+    }, []);
+
+    // Handle form submission for login
     const handleLogin = async (e: React.FormEvent) => {
         e.preventDefault();
 
-        // Prepare the request body
         const body = JSON.stringify({
             employeeNumber,
             password,
             email,
             isMobile,
-            fingerprintHash,
+            fingerprintHash: isMobile ? fingerprintHash : undefined,
         });
 
-        // Make the API request to login
         const res = await fetch('/api/auth/login', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body,
         });
 
-        // Get the response data
         const data = await res.json();
 
         if (res.ok) {
-            // If it's a non-mobile login (PC), an OTP will be sent
             if (!isMobile) {
                 alert('OTP sent to your email');
-                setOtp(data.otp); // Store OTP in state (optional for frontend use)
+                setOtpSent(true);
             } else {
                 alert('Login successful via fingerprint!');
             }
         } else {
-            setError(data.error); // Display error message
+            setError(data.error);
+        }
+    };
+
+    // Handle OTP submission
+    const handleOtpSubmit = async (e: React.FormEvent) => {
+        e.preventDefault();
+
+        const body = JSON.stringify({
+            employeeNumber,
+            otp,
+        });
+
+        const res = await fetch('/api/auth/verify-otp', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body,
+        });
+
+        const data = await res.json();
+
+        if (res.ok) {
+            alert('OTP verified successfully!');
+            setOtpSent(false); // Reset OTP form
+            setOtp('');
+        } else {
+            setError(data.error || 'Invalid OTP');
         }
     };
 
     return (
-        <div className="min-h-screen flex items-center justify-center bg-gray-100 p-4">
-            <div className="max-w-md w-full bg-white p-8 rounded-lg shadow-lg">
-                <h2 className="text-2xl font-semibold text-center mb-6">Login</h2>
+        <div className="min-h-screen bg-gradient-to-r from-indigo-500 via-purple-600 to-pink-500 flex items-center justify-center">
+            <div className="max-w-lg w-full bg-white p-12 rounded-xl shadow-xl transform transition-all duration-500 ease-in-out hover:scale-105">
+                <h2 className="text-4xl font-extrabold text-center text-gray-800 mb-8 animate__animated animate__fadeIn">
+                    Login
+                </h2>
 
-                {/* Display error message if exists */}
-                {error && <p className="text-red-500 text-sm mb-4">{error}</p>}
+                {error && (
+                    <p className="text-red-600 text-sm mb-4 animate__animated animate__fadeIn">
+                        {error}
+                    </p>
+                )}
 
-                <form onSubmit={handleLogin}>
-                    <div className="mb-4">
-                        <label className="block text-sm font-medium text-gray-700" htmlFor="employeeNumber">
+                <div className="text-center mb-4">
+                    {isMobile ? (
+                        <span className="text-green-600 text-lg font-semibold">Mobile Login</span>
+                    ) : (
+                        <span className="text-blue-600 text-lg font-semibold">PC Login</span>
+                    )}
+                </div>
+
+                <form onSubmit={handleLogin} className="space-y-8">
+                    <div className="mb-6">
+                        <label className="block text-lg font-medium text-gray-800" htmlFor="employeeNumber">
                             Employee Number
                         </label>
                         <input
@@ -66,13 +113,14 @@ export default function LoginPage() {
                             id="employeeNumber"
                             value={employeeNumber}
                             onChange={(e) => setEmployeeNumber(e.target.value)}
-                            className="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
+                            className="mt-3 block w-full px-5 py-3 text-gray-800 bg-gray-100 border border-gray-300 rounded-xl shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-opacity-50 transition-all duration-300"
                             placeholder="Enter your employee number"
+                            required
                         />
                     </div>
 
-                    <div className="mb-4">
-                        <label className="block text-sm font-medium text-gray-700" htmlFor="password">
+                    <div className="mb-6">
+                        <label className="block text-lg font-medium text-gray-800" htmlFor="password">
                             Password
                         </label>
                         <input
@@ -80,15 +128,15 @@ export default function LoginPage() {
                             id="password"
                             value={password}
                             onChange={(e) => setPassword(e.target.value)}
-                            className="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
+                            className="mt-3 block w-full px-5 py-3 text-gray-800 bg-gray-100 border border-gray-300 rounded-xl shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-opacity-50 transition-all duration-300"
                             placeholder="Enter your password"
+                            required
                         />
                     </div>
 
-                    {/* If it's a non-mobile login (PC), show email input */}
                     {!isMobile && (
-                        <div className="mb-4">
-                            <label className="block text-sm font-medium text-gray-700" htmlFor="email">
+                        <div className="mb-6">
+                            <label className="block text-lg font-medium text-gray-800" htmlFor="email">
                                 Email
                             </label>
                             <input
@@ -96,16 +144,16 @@ export default function LoginPage() {
                                 id="email"
                                 value={email}
                                 onChange={(e) => setEmail(e.target.value)}
-                                className="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
+                                className="mt-3 block w-full px-5 py-3 text-gray-800 bg-gray-100 border border-gray-300 rounded-xl shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-opacity-50 transition-all duration-300"
                                 placeholder="Enter your email"
+                                required
                             />
                         </div>
                     )}
 
-                    {/* If it's a mobile login, show fingerprint hash input */}
                     {isMobile && (
-                        <div className="mb-4">
-                            <label className="block text-sm font-medium text-gray-700" htmlFor="fingerprintHash">
+                        <div className="mb-6">
+                            <label className="block text-lg font-medium text-gray-800" htmlFor="fingerprintHash">
                                 Fingerprint Hash
                             </label>
                             <input
@@ -113,20 +161,50 @@ export default function LoginPage() {
                                 id="fingerprintHash"
                                 value={fingerprintHash}
                                 onChange={(e) => setFingerprintHash(e.target.value)}
-                                className="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
+                                className="mt-3 block w-full px-5 py-3 text-gray-800 bg-gray-100 border border-gray-300 rounded-xl shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-opacity-50 transition-all duration-300"
                                 placeholder="Enter fingerprint hash"
+                                required
                             />
                         </div>
                     )}
 
-                    {/* Submit Button */}
-                    <button
-                        type="submit"
-                        className="w-full bg-blue-500 text-white py-2 px-4 rounded-md hover:bg-blue-600 focus:ring-4 focus:ring-blue-200 focus:outline-none"
-                    >
-                        Login
-                    </button>
+                    <div className="mb-8">
+                        <button
+                            type="submit"
+                            className="w-full py-3 px-4 bg-gradient-to-r from-indigo-500 to-blue-600 text-white font-semibold rounded-xl hover:bg-gradient-to-l hover:from-indigo-600 hover:to-blue-700 focus:outline-none transition-all duration-300"
+                        >
+                            Login
+                        </button>
+                    </div>
                 </form>
+
+                {otpSent && (
+                    <form onSubmit={handleOtpSubmit} className="space-y-6">
+                        <div className="mb-6">
+                            <label className="block text-lg font-medium text-gray-800" htmlFor="otp">
+                                OTP
+                            </label>
+                            <input
+                                type="text"
+                                id="otp"
+                                value={otp}
+                                onChange={(e) => setOtp(e.target.value)}
+                                className="mt-3 block w-full px-5 py-3 text-gray-800 bg-gray-100 border border-gray-300 rounded-xl shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-opacity-50 transition-all duration-300"
+                                placeholder="Enter OTP sent to your email"
+                                required
+                            />
+                        </div>
+
+                        <div className="mb-8">
+                            <button
+                                type="submit"
+                                className="w-full py-3 px-4 bg-gradient-to-r from-indigo-500 to-blue-600 text-white font-semibold rounded-xl hover:bg-gradient-to-l hover:from-indigo-600 hover:to-blue-700 focus:outline-none transition-all duration-300"
+                            >
+                                Verify OTP
+                            </button>
+                        </div>
+                    </form>
+                )}
             </div>
         </div>
     );
