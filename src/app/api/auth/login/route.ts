@@ -26,8 +26,8 @@ const sendOTP = async (email: string, employeeNumber: string) => {
         const transporter = nodemailer.createTransport({
             service: 'gmail',
             auth: {
-                user: 'umeshkumar@iitdalumni.com', // Replace with your Gmail address
-                pass: 'FcjdrVxJXh8cFXu',      // Replace with your Gmail app password
+                user: '', // Replace with your Gmail address
+                pass: '',      // Replace with your Gmail app password
             },
         });
 

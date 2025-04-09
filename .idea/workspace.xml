@@ -4,13 +4,9 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="f9fa9d5d-da2c-4f1b-8f87-3186b6596766" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/src/app/api/auth/verify-otp/route.ts" afterDir="false" />
+    <list default="true" id="f9fa9d5d-da2c-4f1b-8f87-3186b6596766" name="Changes" comment="After fixing the schema:&#10;&#10;POST /api/auth/login should return 200 OK with { message: 'OTP sent to your email', otp: '...' }.&#10;The OTP email should arrive at umeshkumar111083@gmail.com.&#10;No Prisma validation errors should appear in the logs.">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/prisma/schema.prisma" beforeDir="false" afterPath="$PROJECT_DIR$/prisma/schema.prisma" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/app/api/auth/login/route.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/app/api/auth/login/route.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/app/login/page.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/app/login/page.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/app/signup/page.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/app/signup/page.tsx" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -20,28 +16,28 @@
   <component name="Git.Settings">
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
   </component>
-  <component name="ProjectColorInfo"><![CDATA[{
-  "customColor": "",
-  "associatedIndex": 5
-}]]></component>
+  <component name="ProjectColorInfo">{
+  &quot;customColor&quot;: &quot;&quot;,
+  &quot;associatedIndex&quot;: 5
+}</component>
   <component name="ProjectId" id="2vFFCxOpQaNLLFd6iqGTd5iA0jG" />
   <component name="ProjectViewState">
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
-  <component name="PropertiesComponent"><![CDATA[{
-  "keyToString": {
-    "RunOnceActivity.ShowReadmeOnStart": "true",
-    "git-widget-placeholder": "master",
-    "node.js.detected.package.eslint": "true",
-    "node.js.detected.package.tslint": "true",
-    "node.js.selected.package.eslint": "(autodetect)",
-    "node.js.selected.package.tslint": "(autodetect)",
-    "nodejs_package_manager_path": "yarn",
-    "ts.external.directory.path": "/Users/umeshkumar/Desktop/Projects/workhourssync/node_modules/typescript/lib",
-    "vue.rearranger.settings.migration": "true"
+  <component name="PropertiesComponent">{
+  &quot;keyToString&quot;: {
+    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
+    &quot;git-widget-placeholder&quot;: &quot;master&quot;,
+    &quot;node.js.detected.package.eslint&quot;: &quot;true&quot;,
+    &quot;node.js.detected.package.tslint&quot;: &quot;true&quot;,
+    &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;,
+    &quot;node.js.selected.package.tslint&quot;: &quot;(autodetect)&quot;,
+    &quot;nodejs_package_manager_path&quot;: &quot;yarn&quot;,
+    &quot;ts.external.directory.path&quot;: &quot;/Users/umeshkumar/Desktop/Projects/workhourssync/node_modules/typescript/lib&quot;,
+    &quot;vue.rearranger.settings.migration&quot;: &quot;true&quot;
   }
-}]]></component>
+}</component>
   <component name="SharedIndexes">
     <attachedChunks>
       <set>
@@ -57,11 +53,25 @@
       <option name="number" value="Default" />
       <option name="presentableId" value="Default" />
       <updated>1743732793571</updated>
-      <workItem from="1743732795546" duration="15737000" />
+      <workItem from="1743732795546" duration="16547000" />
+      <workItem from="1744157052201" duration="508000" />
     </task>
+    <task id="LOCAL-00001" summary="After fixing the schema:&#10;&#10;POST /api/auth/login should return 200 OK with { message: 'OTP sent to your email', otp: '...' }.&#10;The OTP email should arrive at umeshkumar111083@gmail.com.&#10;No Prisma validation errors should appear in the logs.">
+      <option name="closed" value="true" />
+      <created>1743752716222</created>
+      <option name="number" value="00001" />
+      <option name="presentableId" value="LOCAL-00001" />
+      <option name="project" value="LOCAL" />
+      <updated>1743752716222</updated>
+    </task>
+    <option name="localTasksCounter" value="2" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
     <option name="version" value="3" />
+  </component>
+  <component name="VcsManagerConfiguration">
+    <MESSAGE value="After fixing the schema:&#10;&#10;POST /api/auth/login should return 200 OK with { message: 'OTP sent to your email', otp: '...' }.&#10;The OTP email should arrive at umeshkumar111083@gmail.com.&#10;No Prisma validation errors should appear in the logs." />
+    <option name="LAST_COMMIT_MESSAGE" value="After fixing the schema:&#10;&#10;POST /api/auth/login should return 200 OK with { message: 'OTP sent to your email', otp: '...' }.&#10;The OTP email should arrive at umeshkumar111083@gmail.com.&#10;No Prisma validation errors should appear in the logs." />
   </component>
 </project>
