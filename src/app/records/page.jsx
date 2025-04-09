@@ -99,31 +99,30 @@ const Records = () => {
     };
 
     return (
-        <div className="w-screen h-full bg-[#b20303] font-black flex flex-col justify-around gap-5 items-center p-3">
-            <div className=' text-5xl flex flex-row justify-center items-center w-full h-auto'>
+        <div className="w-screen h-full bg-white font-black flex flex-col justify-around gap-5 items-center p-3">
+            <div className='text-[#b20303] text-5xl flex flex-row justify-center items-center w-full h-auto'>
                 Records
             </div>
-            <div className='font-extralight flex md:flex-row flex-col justify-around items-center w-full h-auto p-2.5 gap-2.5'>
+            <div className='bg-[#b20303] rounded-2xl font-extralight flex md:flex-row flex-col justify-around items-center md:w-[90%] w-full h-auto p-2.5 gap-2.5'>
                 <div className='text-white text-2xl'>Filter:</div>
-                <input className='w-full bg-white text-black p-2 rounded-2xl' placeholder='Employee ID'/>
+                <input className='w-full bg-white text-black p-2 rounded-xl' placeholder='Employee ID'/>
                 <div className='w-full flex md:flex-row flex-col gap-1 justify-around items-center'>
-                    <input type='date' className='md:w-[48%] w-full bg-white text-black p-2 rounded-2xl' placeholder='Start Date'/>
-                    <input type='date' className='md:w-[48%] w-full bg-white text-black p-2 rounded-2xl' placeholder='End Date'/>
+                    <input type='date' className='md:w-[48%] w-full bg-white text-black p-2 rounded-xl' placeholder='Start Date'/>
+                    <input type='date' className='md:w-[48%] w-full bg-white text-black p-2 rounded-xl' placeholder='End Date'/>
                 </div>
-                <button className='bg-[#0057a6] p-2 md:min-w-[150px] min-w-full rounded-2xl text-white'>Search</button>
+                <button className='bg-[#0377e2] hover:bg-[#0057a6] p-2 md:min-w-[150px] min-w-full rounded-2xl text-white'>Search</button>
             </div>
             
-            <div className=' flex flex-col justify-center items-center w-[99%] h-[600px]'>
-                <div className="flex justify-between items-center w-[95%]">
-                    <div className="p-2 flex-1 text-left" style={{ minWidth: isAdmin ? '30%' : '40%' }}>Date</div>
-                    <div className="p-2 flex-1 text-left" style={{ minWidth: isAdmin ? '25%' : '30%' }}>Check-In Time</div>
-                    <div className="p-2 flex-1 text-left" style={{ minWidth: isAdmin ? '25%' : '30%' }}>Check-Out Time</div>
-                    {isAdmin && <div className="p-2 flex-1 text-left" style={{ minWidth: '20%' }}>Action</div>}
-                </div>
-
-                <div className="flex flex-col justify-between overflow-scroll w-full min-h-[80vh] max-h-[80vh] border-solid border-2 border-white">
+            <div className='bg-[#b20303] overflow-hidden flex flex-col justify-center items-center md:w-[90%] w-full max-h-[600px] rounded-2xl'>
+                <div className="flex flex-col justify-between overflow-scroll w-full h-auto border-solid border-2 border-white">
+                    <div className="flex justify-between items-center w-full m-2.5">
+                        <div className="p-2 flex-1 text-left" style={{ minWidth: isAdmin ? '30%' : '40%' }}>Date</div>
+                        <div className="p-2 flex-1 text-left" style={{ minWidth: isAdmin ? '25%' : '30%' }}>Check-In Time</div>
+                        <div className="p-2 flex-1 text-left" style={{ minWidth: isAdmin ? '25%' : '30%' }}>Check-Out Time</div>
+                        {isAdmin && <div className="p-2 flex-1 text-left" style={{ minWidth: '20%' }}>Action</div>}
+                    </div>
                     {processedData.map((item, index) => (
-                        <div key={index} className="flex w-full">
+                        <div key={index} className="flex w-full" style={{ backgroundColor: index%2 !=0 ? "#b20303" : "#d65252"}}>
                             <div className="p-2 flex-1 border-t" style={{ minWidth: isAdmin ? '30%' : '40%' }}>
                                 {item.date}
                             </div>
