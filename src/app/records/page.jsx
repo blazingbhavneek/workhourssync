@@ -19,7 +19,7 @@ const Records = () => {
         //         console.error('Error decoding token:', error);
         //     }
         // }
-        // setIsAdmin(true);
+        setIsAdmin(true);
     }, []);
 
     useEffect(() => {
@@ -99,33 +99,33 @@ const Records = () => {
     };
 
     return (
-        <div className="w-screen h-full bg-white font-black flex flex-col justify-around gap-5 items-center p-3">
-            <div className='text-[#b20303] text-5xl flex flex-row justify-center items-center w-full h-auto'>
+        <div className="w-screen h-full bg-white font-black flex flex-col justify-around gap-5 items-center">
+            <div className='p-2.5 bg-[#b20303] text-white text-5xl flex flex-row justify-center items-center w-full h-auto'>
                 Records
             </div>
-            <div className='bg-[#b20303] rounded-2xl font-extralight flex md:flex-row flex-col justify-around items-center md:w-[90%] w-full h-auto p-2.5 gap-2.5'>
-                <div className='text-white text-2xl'>Filter:</div>
+            <div className='bg-transparent rounded-2xl font-extralight flex md:flex-row flex-col justify-around items-center md:w-[90%] w-full h-auto p-2.5 gap-2.5'>
+                <div className='text-black text-2xl'>Filter:</div>
                 {isAdmin && (
-                    <input className='w-full bg-white text-black p-2 rounded-xl' placeholder='Employee ID'/>
+                    <input className='border-1 w-full bg-white text-black p-2 rounded-xl' placeholder='Employee ID'/>
                 )}
                 <div className='w-full flex md:flex-row flex-col gap-1 justify-around items-center'>
-                    <input type='date' className='md:w-[48%] w-full bg-white text-black p-2 rounded-xl' placeholder='Start Date'/>
-                    <input type='date' className='md:w-[48%] w-full bg-white text-black p-2 rounded-xl' placeholder='End Date'/>
+                    <input type='date' className='border-1 md:w-[48%] w-full bg-white text-black p-2 rounded-xl' placeholder='Start Date'/>
+                    <input type='date' className='border-1 md:w-[48%] w-full bg-white text-black p-2 rounded-xl' placeholder='End Date'/>
                 </div>
-                <button className='bg-[#0377e2] hover:bg-[#0057a6] p-2 md:min-w-[150px] min-w-full rounded-2xl text-white'>Search</button>
+                <button className='bg-[#0377e2] hover:bg-[#0057a6] p-2 md:min-w-[150px] min-w-full rounded-xl text-white'>Search</button>
             </div>
             
-            <div className='bg-[#b20303] overflow-hidden flex flex-col justify-center items-center md:w-[90%] w-full max-h-[600px] rounded-2xl'>
-                <div className="flex flex-col justify-between overflow-scroll w-full h-auto border-solid border-2 border-white">
-                    <div className="flex justify-between items-center w-full m-2.5">
-                        <div className="p-2 flex-1 text-left" style={{ minWidth: isAdmin ? '30%' : '40%' }}>Date</div>
-                        <div className="p-2 flex-1 text-left" style={{ minWidth: isAdmin ? '25%' : '30%' }}>Check-In Time</div>
-                        <div className="p-2 flex-1 text-left" style={{ minWidth: isAdmin ? '25%' : '30%' }}>Check-Out Time</div>
-                        {isAdmin && <div className="p-2 flex-1 text-left" style={{ minWidth: '20%' }}>Action</div>}
+            <div className='overflow-hidden flex flex-col justify-center items-center md:w-[90%] w-full max-h-[600px] text-gray-800'>
+                <div className="flex flex-col justify-between overflow-scroll w-full h-auto border-solid border-1 border-gray-400">
+                    <div className="bg-[#0377e2] flex justify-between items-center w-full p-2.5 text-white">
+                        <div className="p-2 flex-1 text-center" style={{ minWidth: isAdmin ? '30%' : '40%' }}>Date</div>
+                        <div className="p-2 flex-1 text-center" style={{ minWidth: isAdmin ? '25%' : '30%' }}>Check-In Time</div>
+                        <div className="p-2 flex-1 text-center" style={{ minWidth: isAdmin ? '25%' : '30%' }}>Check-Out Time</div>
+                        {isAdmin && <div className="p-2 flex-1 text-center" style={{ minWidth: '20%' }}>Action</div>}
                     </div>
                     {processedData.map((item, index) => (
-                        <div key={index} className="flex w-full" style={{ backgroundColor: index%2 !=0 ? "#b20303" : "#d65252"}}>
-                            <div className="p-2 flex-1 border-t" style={{ minWidth: isAdmin ? '30%' : '40%' }}>
+                        <div key={index} className="flex w-full" style={{ backgroundColor: index%2 !=0 ? "#fff" : "#dadada"}}>
+                            <div className="p-2 flex-1 border-t text-center" style={{ minWidth: isAdmin ? '30%' : '40%' }}>
                                 {item.date}
                             </div>
                             <div className="text-[14px] p-2 flex-1 border-t" style={{ minWidth: isAdmin ? '25%' : '30%' }}>
@@ -134,7 +134,7 @@ const Records = () => {
                                         type="text"
                                         value={editableTimes[item.date]?.checkInTime || ''}
                                         onChange={(e) => handleTimeChange(item.date, 'checkInTime', e.target.value)}
-                                        className="w-full bg-white text-black p-1 rounded"
+                                        className="w-full bg-white text-black p-1 rounded border-1 border-[#b8b8b8] text-center"
                                     />
                                 ) : (
                                     item.checkInTime || '--'
@@ -146,14 +146,14 @@ const Records = () => {
                                         type="text"
                                         value={editableTimes[item.date]?.checkOutTime || ''}
                                         onChange={(e) => handleTimeChange(item.date, 'checkOutTime', e.target.value)}
-                                        className="w-full bg-white text-black p-1 rounded"
+                                        className="w-full bg-white text-black p-1 rounded border-1 border-[#b8b8b8] text-center"
                                     />
                                 ) : (
                                     item.checkOutTime || '--'
                                 )}
                             </div>
                             {isAdmin && (
-                                <div className="p-2 flex-1 border-t" style={{ minWidth: '20%' }}>
+                                <div className="p-2 flex-1 border-t text-center" style={{ minWidth: '20%' }}>
                                     <button
                                         onClick={() => handleSave(item.date)}
                                         className="bg-[#0377e2] hover:bg-[#0057a6] text-white font-bold py-1 px-3 rounded"
