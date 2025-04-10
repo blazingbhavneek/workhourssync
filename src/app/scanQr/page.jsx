@@ -82,15 +82,12 @@ const CameraScanner = () => {
       ) : (
         <div className='bg-black flex flex-col gap-2.5 justify-center items-center h-screen w-screen overflow-hidden'
         >
-            <div className='border-2 overflow-hidden min-h-[300px] min-w-[300px] max-h-[300px] max-w-[300px]'
-            style={{ minWidth: '300px', maxWidth: '300px', minHeight: '300px', maxHeight: '300px' }}
+            <div className='border-2 overflow-hidden sm:w-[300px] sm:h-[300px] w-[200px] h-[200px]'
             >
                 <Image
                     src={qrPng}
                     alt="QR Code"
-                    className="absolute"
-                    width={300}
-                    height={300}
+                    className="absolute sm:w-[300px] sm:h-[300px] w-[200px] h-[200px]"
                     />
                 <video
                     ref={videoRef}
@@ -99,15 +96,15 @@ const CameraScanner = () => {
                         width: '100%',
                         height: '100%',
                         objectFit: 'cover',
-                        minWidth: '300px',
-                        maxWidth: '300px',
-                        minHeight: '300px',
-                        maxHeight: '300px'
                     }}
                     />
             </div>
           <button onClick={captureAndSend} className='bg-white p-3 rounded-3xl text-black' >
             Capture & Send
+          </button>
+
+          <button onClick={() => setIsCameraOn(false)} className='bg-white p-3 rounded-3xl text-black' >
+            Stop Camera
           </button>
           <canvas ref={canvasRef} style={{ display: 'none' }} />
         </div>
