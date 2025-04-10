@@ -73,6 +73,9 @@ const CameraScanner = () => {
 
   return (
     <div>
+        <div className='absolute top-0 left-0 text-center text-white bg-[#b20303] text-5xl flex flex-row justify-center items-center w-full h-auto p-3.5'>
+            Scan QR Code...
+        </div>
       {!isCameraOn ? (
         <div className='bg-white flex flex-col justify-center items-center h-screen w-screen'>
             <button className='bg-[#0377e2] p-3 rounded-3xl text-white'  onClick={() => setIsCameraOn(true)}>
