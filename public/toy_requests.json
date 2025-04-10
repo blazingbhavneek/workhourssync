@@ -1,0 +1,88 @@
+{
+    "employees": [
+      {
+        "employee_id": 1,
+        "employee_name": "John Doe"
+      },
+      {
+        "employee_id": 2,
+        "employee_name": "Jane Smith"
+      },
+      {
+        "employee_id": 3,
+        "employee_name": "Bob Wilson"
+      }
+    ],
+    "requests": [
+      {
+        "request_id": 101,
+        "employee_id": 1,
+        "request_type": "lateness",
+        "status": "pending",
+        "reason": "Traffic jam due to accident",
+        "time": "2023-07-25T09:35:00",
+        "start_date": null,
+        "end_date": null
+      },
+      {
+        "request_id": 102,
+        "employee_id": 2,
+        "request_type": "paid_holiday",
+        "status": "approved",
+        "reason": "Family vacation",
+        "time": null,
+        "start_date": "2023-08-15",
+        "end_date": "2023-08-18"
+      },
+      {
+        "request_id": 103,
+        "employee_id": 1,
+        "request_type": "early_leave",
+        "status": "rejected",
+        "reason": "Doctor appointment",
+        "time": "2023-07-26T15:00:00",
+        "start_date": null,
+        "end_date": null
+      },
+      {
+        "request_id": 104,
+        "employee_id": 3,
+        "request_type": "unpaid_holiday",
+        "status": "pending",
+        "reason": "Personal matters",
+        "time": null,
+        "start_date": "2023-09-01",
+        "end_date": "2023-09-05"
+      },
+      {
+        "request_id": 105,
+        "employee_id": 2,
+        "request_type": "lateness",
+        "status": "approved",
+        "reason": "Public transport delay",
+        "time": "2023-07-28T10:15:00",
+        "start_date": null,
+        "end_date": null
+      }
+    ],
+    "documents": [
+      {
+        "document_id": 1001,
+        "request_id": 101,
+        "file_name": "accident_report.jpg",
+        "file_type": "jpg"
+      },
+      {
+        "document_id": 1002,
+        "request_id": 102,
+        "file_name": "vacation_approval.pdf",
+        "file_type": "pdf"
+      },
+      {
+        "document_id": 1003,
+        "request_id": 104,
+        "file_name": "personal_leave_form.pdf",
+        "file_type": "pdf"
+      }
+    ]
+  }
