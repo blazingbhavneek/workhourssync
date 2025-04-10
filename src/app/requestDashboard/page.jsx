@@ -17,7 +17,7 @@ const RequestDashboard = () => {
     });
 
     useEffect(() => {
-        // setIsAdmin(true);
+        setIsAdmin(true);
     }, []);
 
     useEffect(() => {
@@ -111,16 +111,17 @@ const RequestDashboard = () => {
     };
 
     return (
-        <div className="w-screen min-h-screen bg-white font-black flex flex-col justify-around gap-5 items-center p-3">
-            <div className='text-[#b20303] text-5xl flex flex-row justify-center items-center w-full h-auto'>
+        <div className="w-screen min-h-screen bg-white font-black flex flex-col justify-start gap-10 items-center pb-2.5">
+            <div className='text-white bg-[#b20303] text-5xl flex flex-row justify-center items-center w-full h-auto p-3.5'>
                 Request Management
             </div>
             
             {/* Filter Section */}
-            <div className='bg-[#b20303] rounded-2xl font-extralight flex flex-col md:flex-row justify-around items-center w-full md:w-[90%] p-4 gap-4'>
+            <div className='bg-transparent rounded-2xl font-extralight flex flex-col md:flex-row justify-around items-center w-full md:w-[90%] p-4 gap-4'>
+                <div className='text-black text-2xl'>Filter:</div>
                 {isAdmin && (
                 <input 
-                    className='w-full bg-white text-black p-2 rounded-xl'
+                    className='w-full bg-white text-black p-2 rounded-xl border-1'
                     placeholder='Employee ID'
                     value={filters.employeeId}
                     onChange={(e) => handleFilterChange('employeeId', e.target.value)}
@@ -128,7 +129,7 @@ const RequestDashboard = () => {
                 )}
                 
                 <select 
-                    className='w-full bg-white text-black p-2 rounded-xl'
+                    className='w-full bg-white text-black p-2 rounded-xl border-1'
                     value={filters.requestType}
                     onChange={(e) => handleFilterChange('requestType', e.target.value)}
                 >
@@ -140,7 +141,7 @@ const RequestDashboard = () => {
                 </select>
 
                 <select 
-                    className='w-full bg-white text-black p-2 rounded-xl'
+                    className='w-full bg-white text-black p-2 rounded-xl border-1'
                     value={filters.status}
                     onChange={(e) => handleFilterChange('status', e.target.value)}
                 >
@@ -153,13 +154,13 @@ const RequestDashboard = () => {
                 <div className='w-full flex gap-2'>
                     <input 
                         type='date' 
-                        className='w-full bg-white text-black p-2 rounded-xl'
+                        className='w-full bg-white text-black p-2 rounded-xl border-1'
                         value={filters.startDate}
                         onChange={(e) => handleFilterChange('startDate', e.target.value)}
                     />
                     <input 
                         type='date' 
-                        className='w-full bg-white text-black p-2 rounded-xl'
+                        className='w-full bg-white text-black p-2 rounded-xl border-1'
                         value={filters.endDate}
                         onChange={(e) => handleFilterChange('endDate', e.target.value)}
                     />
@@ -167,45 +168,44 @@ const RequestDashboard = () => {
             </div>
 
             {/* Requests Table */}
-            <div className='text-sm max-h-[800px] bg-[#b20303] overflow-hidden flex flex-col justify-center items-center w-full md:w-[90%] rounded-2xl'>
-                <div className="w-full overflow-auto max-h-[600px]">
-                    <div className="min-w-[1000px]">
+            <div className='text-gray-800 text-sm max-h-[800px] bg-transparent overflow-scroll flex flex-col justify-center w-[98%] md:w-[90%] rounded-2xl'>
+                <div className="min-w-[1500px] h-auto flex flex-col">
                         {/* Table Header */}
-                        <div className="flex bg-[#b20303] text-white sticky top-0">
-                            <div className="p-3 flex-1 min-w-[150px]">Employee</div>
-                            <div className="p-3 flex-1 min-w-[120px]">Type</div>
-                            <div className="p-3 flex-1 min-w-[180px]">Date/Range</div>
-                            <div className="p-3 flex-1 min-w-[200px]">Reason</div>
-                            <div className="p-3 flex-1 min-w-[120px]">Documents</div>
-                            <div className="p-3 flex-1 min-w-[120px]">Status</div>
-                            {isAdmin && <div className="p-3 flex-1 min-w-[100px]">Action</div>}
+                        <div className="bg-[#0377e2] flex flex-row justify-around items-center p-2.5 text-white text-center">
+                            <div className="p-3 w-[15%]">Employee</div>
+                            <div className="p-3 w-[10%]">Type</div>
+                            <div className="p-3 w-[20%]">Date/Range</div>
+                            <div className="p-3 w-[15%]">Reason</div>
+                            <div className="p-3 w-[20%]">Documents</div>
+                            <div className="p-3 w-[10%]">Status</div>
+                            {isAdmin && (<div className="p-3 w-[10%]">Action</div>)}
                         </div>
 
                         {/* Table Rows */}
                         {processedData.map((request, index) => (
                             <div 
                                 key={request.request_id}
-                                className="flex items-center text-white"
-                                style={{ backgroundColor: index % 2 ? '#b20303' : '#d65252' }}
+                                className="flex flex-row items-center justify-around w-full text-center"
+                                style={{ backgroundColor: index % 2 ? '#fff' : '#dadada' }}
                             >
-                                <div className="p-3 flex-1 min-w-[150px]">
+                                <div className="p-3 w-[15%]">
                                     {request.employee_name}
                                 </div>
-                                <div className="p-3 flex-1 min-w-[120px]">
+                                <div className="p-3 w-[10%]">
                                     {request.request_type.replace('_', ' ')}
                                 </div>
-                                <div className="p-3 flex-1 min-w-[180px]">
+                                <div className="p-3 w-[20%]">
                                     {getDateDisplay(request)}
                                 </div>
-                                <div className="p-3 flex-1 min-w-[200px]">
+                                <div className="p-3 w-[15%]">
                                     {request.reason}
                                 </div>
-                                <div className="p-3 flex-1 min-w-[120px]">
+                                <div className="p-3 w-[20%]">
                                     {request.documents.map(doc => (
                                         <a 
                                             key={doc.document_id}
                                             href={`/docs/${doc.file_name}`}
-                                            className="block text-blue-200 hover:text-blue-400"
+                                            className="block text-gray-800 hover:text-gray-950"
                                             target="_blank"
                                             rel="noopener noreferrer"
                                         >
@@ -213,7 +213,7 @@ const RequestDashboard = () => {
                                         </a>
                                     ))}
                                 </div>
-                                <div className="p-3 flex-1 min-w-[120px]">
+                                <div className="p-3 w-[10%]">
                                     {isAdmin ? (
                                         <select
                                             value={editableStatuses[request.request_id]}
@@ -234,7 +234,7 @@ const RequestDashboard = () => {
                                     )}
                                 </div>
                                 {isAdmin && (
-                                    <div className="p-3 flex-1 min-w-[100px]">
+                                    <div className="p-3 w-[10%]">
                                         <button
                                             onClick={() => handleSave(request.request_id)}
                                             className="bg-[#0377e2] hover:bg-[#0057a6] text-white font-bold py-1 px-3 rounded"
@@ -245,7 +245,7 @@ const RequestDashboard = () => {
                                 )}
                             </div>
                         ))}
-                    </div>
+
                 </div>
             </div>
         </div>
