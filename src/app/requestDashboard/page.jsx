@@ -17,7 +17,7 @@ const RequestDashboard = () => {
     });
 
     useEffect(() => {
-        // setIsAdmin(true);
+        setIsAdmin(true);
     }, []);
 
     useEffect(() => {
