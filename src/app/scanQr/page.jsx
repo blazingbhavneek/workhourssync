@@ -74,13 +74,13 @@ const CameraScanner = () => {
   return (
     <div>
       {!isCameraOn ? (
-        <div className='bg-black flex flex-col justify-center items-center h-screen w-screen'>
-            <button className='bg-white p-3 rounded-3xl text-black'  onClick={() => setIsCameraOn(true)}>
+        <div className='bg-white flex flex-col justify-center items-center h-screen w-screen'>
+            <button className='bg-[#0377e2] p-3 rounded-3xl text-white'  onClick={() => setIsCameraOn(true)}>
             Open Scanner
             </button>
         </div>
       ) : (
-        <div className='bg-black flex flex-col gap-2.5 justify-center items-center h-screen w-screen overflow-hidden'
+        <div className='bg-white flex flex-col gap-2.5 justify-center items-center h-screen w-screen overflow-hidden'
         >
             <div className='border-2 overflow-hidden sm:w-[300px] sm:h-[300px] w-[200px] h-[200px]'
             >
@@ -99,11 +99,11 @@ const CameraScanner = () => {
                     }}
                     />
             </div>
-          <button onClick={captureAndSend} className='bg-white p-3 rounded-3xl text-black' >
+          <button onClick={captureAndSend} className='bg-[#0377e2] p-3 rounded-3xl text-white' >
             Capture & Send
           </button>
 
-          <button onClick={() => setIsCameraOn(false)} className='bg-white p-3 rounded-3xl text-black' >
+          <button onClick={() => setIsCameraOn(false)} className='bg-[#0377e2] p-3 rounded-3xl text-white' >
             Stop Camera
           </button>
           <canvas ref={canvasRef} style={{ display: 'none' }} />
