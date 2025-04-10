@@ -17,7 +17,7 @@ const RequestDashboard = () => {
     });
 
     useEffect(() => {
-        setIsAdmin(true);
+        // setIsAdmin(true);
     }, []);
 
     useEffect(() => {
@@ -200,7 +200,7 @@ const RequestDashboard = () => {
                                 <div className="p-3 w-[15%]">
                                     {request.reason}
                                 </div>
-                                <div className="p-3 w-[20%]">
+                                <div className="p-3 w-[20%] underline">
                                     {request.documents.map(doc => (
                                         <a 
                                             key={doc.document_id}
