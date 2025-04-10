@@ -19,7 +19,7 @@ const Records = () => {
         //         console.error('Error decoding token:', error);
         //     }
         // }
-        setIsAdmin(true);
+        // setIsAdmin(true);
     }, []);
 
     useEffect(() => {
@@ -105,7 +105,9 @@ const Records = () => {
             </div>
             <div className='bg-[#b20303] rounded-2xl font-extralight flex md:flex-row flex-col justify-around items-center md:w-[90%] w-full h-auto p-2.5 gap-2.5'>
                 <div className='text-white text-2xl'>Filter:</div>
-                <input className='w-full bg-white text-black p-2 rounded-xl' placeholder='Employee ID'/>
+                {isAdmin && (
+                    <input className='w-full bg-white text-black p-2 rounded-xl' placeholder='Employee ID'/>
+                )}
                 <div className='w-full flex md:flex-row flex-col gap-1 justify-around items-center'>
                     <input type='date' className='md:w-[48%] w-full bg-white text-black p-2 rounded-xl' placeholder='Start Date'/>
                     <input type='date' className='md:w-[48%] w-full bg-white text-black p-2 rounded-xl' placeholder='End Date'/>
