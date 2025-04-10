@@ -218,7 +218,7 @@ const RequestDashboard = () => {
                                         <select
                                             value={editableStatuses[request.request_id]}
                                             onChange={(e) => handleStatusChange(request.request_id, e.target.value)}
-                                            className="w-full bg-white text-black p-1 rounded"
+                                            className="w-full bg-white text-black p-1 rounded border-1 border-gray-400"
                                         >
                                             <option value="pending">Pending</option>
                                             <option value="approved">Approved</option>
