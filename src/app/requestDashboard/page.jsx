@@ -112,7 +112,7 @@ const RequestDashboard = () => {
 
     return (
         <div className="w-screen min-h-screen bg-white font-black flex flex-col justify-start gap-10 items-center pb-2.5">
-            <div className='text-white bg-[#b20303] text-5xl flex flex-row justify-center items-center w-full h-auto p-3.5'>
+            <div className='text-center text-white bg-[#b20303] text-5xl flex flex-row justify-center items-center w-full h-auto p-3.5'>
                 Request Management
             </div>
             
@@ -168,7 +168,7 @@ const RequestDashboard = () => {
             </div>
 
             {/* Requests Table */}
-            <div className='text-gray-800 text-sm max-h-[800px] bg-transparent overflow-scroll flex flex-col justify-center w-[98%] md:w-[90%] rounded-2xl'>
+            <div className='text-gray-800 text-sm max-h-[800px] bg-transparent overflow-scroll flex flex-col justify-center w-[98%] md:w-[90%]'>
                 <div className="min-w-[1500px] h-auto flex flex-col">
                         {/* Table Header */}
                         <div className="bg-[#0377e2] flex flex-row justify-around items-center p-2.5 text-white text-center">
