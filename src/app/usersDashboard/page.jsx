@@ -8,15 +8,15 @@ const Users = () => {
     const [editItems, setEditItems] = useState({});
     const [filters, setFilters] = useState({
         employeeId: "",
-        startDate: "",
-        endDate: ""
+        role: "",
+        locs: ""
     })
     useEffect(() => {
         setIsAdmin(true);
     }, []);
 
     useEffect(() => {
-        fetch('/toy_users.json')
+        fetch('/api/users')
             .then(response => response.json())
             .then(data => {
                 setUsers(data)
@@ -92,7 +92,7 @@ const Users = () => {
 
             {/* Requests Table */}
             <div className='text-gray-800 text-sm max-h-[600px] bg-transparent overflow-scroll flex flex-col  w-[98%] md:w-[90%]'>
-                <div className="min-w-[1000px] h-auto flex flex-col">
+                <div className="min-w-[1500px] h-auto flex flex-col">
                         {/* Table Header */}
                         <div className="bg-[#0377e2] flex flex-row justify-around items-center p-2.5 text-white text-center">
                             <div className="p-3 w-[10%]">Employee Number</div>
@@ -113,43 +113,56 @@ const Users = () => {
                             style={{ backgroundColor: index % 2 ? '#fff' : '#dadada' }}
                         >
                             <div className="p-3 w-[10%]">{user.employeeNumber}</div>
-                            <div className="p-3 w-[20%]">{user.employeeName}</div>
+                            <div className="p-3 w-[20%]">{user.name}</div>
                             <div className="p-3 w-[15%]">{user.email}</div>
                             <div className="p-3 w-[10%]">
-                                <select 
-                                    className=' bg-white p-2 rounded-xl border-1 border-gray-300'
-                                    value={user.role}
-                                    onChange={(e) => {
-                                        handleFieldChange(user.id, 'role', e.target.value);
-                                        setEditItems((prev) => ({
-                                            ...prev, [user.id]:true
-                                        }))
-                                    }}
-                                >
-                                    <option value="ADMIN">admin</option>
-                                    <option value="EMPLOYEE">employee</option>
-                                </select>
+                                {
+                                    isAdmin ? 
+                                    (<select 
+                                        className=' bg-white p-2 rounded-xl border-1 border-gray-300'
+                                        value={user.role}
+                                        onChange={(e) => {
+                                            handleFieldChange(user.id, 'role', e.target.value);
+                                            setEditItems((prev) => ({
+                                                ...prev, [user.id]:true
+                                            }))
+                                        }}
+                                    >
+                                        <option value="ADMIN">admin</option>
+                                        <option value="EMPLOYEE">employee</option>
+                                    </select>)
+                                    :
+                                    user.role
+                                }
                             </div>
                             <div className="p-3 w-[15%]">
-                            <input
-                                type="text"
-                                value={user.workLocationIds}
-                                onChange={(e) => {
-                                    handleFieldChange(user.id, 'workLocationIds', e.target.value)
-                                    setEditItems((prev) => ({
-                                        ...prev, [user.id]:true
-                                    }))                                
-                                }}
-                                className="w-3/4 p-2 bg-white border-1 border-gray-300 rounded-xl"
-                            />
+                            {
+                                isAdmin ? (<input
+                                    type="text"
+                                    value={user.workLocationId}
+                                    onChange={(e) => {
+                                        handleFieldChange(user.id, 'workLocationIds', e.target.value)
+                                        setEditItems((prev) => ({
+                                            ...prev, [user.id]:true
+                                        }))                                
+                                    }}
+                                    className="w-3/4 p-2 bg-white border-1 border-gray-300 rounded-xl"
+                                />) : user.workLocationId
+                            }
                             </div>
                             <div className="p-3 w-[10%]">{user.createdAt}</div>
                             <div className="p-3 w-[10%]">{user.updatedAt}</div>
                             <div className="p-3 w-[10%] flex flex-col">
-                            <button 
-                            style={{backgroundColor: editItems[user.id] ? "#0377e2" : "#dadada"}}
-                            onClick={() => handleUpdate(user)} className="mb-1 bg-blue-500 text-white px-2 py-1">Update</button>
-                            <button onClick={() => handleDelete(user.id)} className="bg-red-500 text-white px-2 py-1">Delete</button>
+                            {
+                                isAdmin ? (
+                                    <>
+                                        <button 
+                                        style={{backgroundColor: editItems[user.id] ? "#0377e2" : "#dadada"}}
+                                        onClick={() => handleUpdate(user)} className="mb-1 bg-blue-500 text-white px-2 py-1">Update</button>
+                                        <button onClick={() => handleDelete(user.id)} className="bg-red-500 text-white px-2 py-1">Delete</button>
+                                    </>
+                                ) : "-"
+                            }
                             </div>
                         </div>
                         ))}
