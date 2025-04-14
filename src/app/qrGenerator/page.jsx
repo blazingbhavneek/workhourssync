@@ -6,20 +6,22 @@ export default function DynamicQRCode() {
   const [value, setValue] = useState('');
   const [isGeneratorOn, setIsGeneratorOn] = useState(false);
 
+  const generate = () => {
+    const payload = JSON.stringify({
+      employeeId: 1234567890, // session.user.employeeId,
+      expiry: Date.now() + 10000
+    })
+    let qrCode = window.btoa(payload);
+    console.log(qrCode);
+    setValue(qrCode);
+  }
+  
   useEffect(() => {
-    const generate = () => {
-      const payload = JSON.stringify({
-        employeeId: 1234567890, // session.user.employeeId,
-        expiry: Date.now() + 10000
-      })
-      let qrCode = window.btoa(payload);
-      console.log(qrCode);
-      setValue(qrCode);
-    }
+    if(!isGeneratorOn) return;
     generate()
     const id = setInterval(generate, 2000)
     return () => clearInterval(id)
-  }, [])
+  }, [isGeneratorOn])
 
   return <div className='bg-white flex flex-col justify-center items-center h-screen w-screen'>
             <div className='absolute top-0 left-0 text-center text-white bg-[#b20303] text-5xl flex flex-row justify-center items-center w-full h-auto p-3.5'>
