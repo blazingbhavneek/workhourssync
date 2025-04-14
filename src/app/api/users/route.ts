@@ -55,3 +55,30 @@ export async function GET(request: NextRequest) {
     return handleError(error, 'Internal server error');
   }
 }
+
+
+export async function PUT(request: NextRequest) {
+  try {
+    const user = await request.json();
+
+    const { id, ...fieldsToUpdate } = user;
+
+    if (!id) {
+      return NextResponse.json({ error: 'User ID is required' }, { status: 400 });
+    }
+
+    const { error } = await supabase
+      .from('User')
+      .update(fieldsToUpdate)
+      .eq('id', id);
+
+    if (error) {
+      console.log(error)
+      return NextResponse.json({ error: error.message }, { status: 500 });
+    }
+
+    return NextResponse.json({ message: 'User updated successfully' });
+  } catch (error) {
+    return NextResponse.json({ error: 'Invalid request' }, { status: 400 });
+  }
+}

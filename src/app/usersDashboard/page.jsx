@@ -6,36 +6,46 @@ const Users = () => {
     const [isAdmin, setIsAdmin] = useState(false);
     const [users, setUsers] = useState([]);
     const [editItems, setEditItems] = useState({});
+    const [employeeId, setEmployeeId] = useState("");
+    const [role, setRole] = useState("");
+    const [workLocationsParam, setWorkLocationsParam] = useState("");
+
     const [filters, setFilters] = useState({
         employeeId: "",
         role: "",
-        locs: ""
-    })
+        workLocationsParam: ""
+    });
+
     useEffect(() => {
         setIsAdmin(true);
     }, []);
 
-    useEffect(() => {
-        fetch('/api/users')
+    const fetchUsers = () => {
+        const query = new URLSearchParams(
+            Object.fromEntries(
+                Object.entries(filters).filter(([_, v]) => v != null && v !== "")
+            )
+        ).toString();
+        
+        const url = query ? `/api/users?${query}` : '/api/users';
+        console.log(url);
+        fetch(url)        
             .then(response => response.json())
             .then(data => {
-                setUsers(data)
+                setUsers(data);
+                setEditItems({});
             })
             .catch(console.error);
-    }, []);
+    }
 
-    const handleFieldChange = (id, field, value) => {
-        setUsers((prev) =>
-          prev.map((user) =>
-            user.id === id ? { ...user, [field]: value } : user
-          )
-        );
-      };
+    useEffect(() => {
+        fetchUsers();
+    }, [filters]);    
       
       const handleUpdate = async (user) => {
         try {
-          await fetch('/api/updateUser', {
-            method: 'POST',
+          await fetch('/api/users', {
+            method: 'PUT',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify(user),
           });
@@ -43,6 +53,9 @@ const Users = () => {
           setEditItems((prev) => ({
             ...prev, [user.id]:false
         })) 
+
+        fetchUsers();
+
         } catch (err) {
           console.error(err);
         }
@@ -50,11 +63,20 @@ const Users = () => {
       
       const handleDelete = async (id) => {
         try {
-          await fetch(`/api/deleteUser/${id}`, { method: 'DELETE' });
+          await fetch(`/api/users`, { method: 'DELETE' });
         } catch (err) {
           console.error(err);
         }
       };
+
+      const handleFieldChange = (id, field, value) => {
+        setUsers((prev) =>
+          prev.map((user) =>
+            user.id === id ? { ...user, [field]: value } : user
+          )
+        );
+      };
+
       
     
     return (
@@ -65,30 +87,43 @@ const Users = () => {
             
             <div className='bg-transparent rounded-2xl font-extralight flex flex-col md:flex-row justify-around items-center w-full md:w-[90%] p-4 gap-4'>
                 <div className='text-black text-2xl'>Filter:</div>
-                {isAdmin && (
                 <input 
                     className='w-full bg-white text-black p-2 rounded-xl border-1'
                     placeholder='Employee ID'
-                    value={filters.employeeId}
-                    onChange={(e) => handleFilterChange('employeeId', e.target.value)}
+                    value={employeeId || ""}
+                    onChange={(e) => setEmployeeId(e.target.value)}
                 />
-                )}
-
                 <div className='w-full flex gap-2'>
+                    <select 
+                        className=' w-full bg-white text-black p-2 rounded-xl border-1'
+                        value={role || ""}
+                        onChange={(e) => setRole(e.target.value)}
+                    >
+                        <option value="">All</option>
+                        <option value="ADMIN">Admin</option>
+                        <option value="EMPLOYEE">Employee</option>
+                    </select>
                     <input 
-                        type='date' 
+                        type='text'
                         className='w-full bg-white text-black p-2 rounded-xl border-1'
-                        value={filters.startDate}
-                        onChange={(e) => handleFilterChange('startDate', e.target.value)}
-                    />
-                    <input 
-                        type='date' 
-                        className='w-full bg-white text-black p-2 rounded-xl border-1'
-                        value={filters.endDate}
-                        onChange={(e) => handleFilterChange('endDate', e.target.value)}
+                        value={workLocationsParam || ""}
+                        onChange={(e) => setWorkLocationsParam(e.target.value)}
                     />
                 </div>
+                <button 
+                    className='bg-blue-500 text-white p-2 rounded-xl min-w-[150px]'
+                    onClick={() => {
+                        setFilters({
+                            employeeId,
+                            role,
+                            workLocationsParam,
+                        });
+                    }}
+                >
+                    Apply Filters
+                </button>
             </div>
+
 
             {/* Requests Table */}
             <div className='text-gray-800 text-sm max-h-[600px] bg-transparent overflow-scroll flex flex-col  w-[98%] md:w-[90%]'>
@@ -141,7 +176,8 @@ const Users = () => {
                                     type="text"
                                     value={user.workLocationId}
                                     onChange={(e) => {
-                                        handleFieldChange(user.id, 'workLocationIds', e.target.value)
+                                        let inputText = e.target.value
+                                        handleFieldChange(user.id, 'workLocationId', inputText.split(',').map(Number));
                                         setEditItems((prev) => ({
                                             ...prev, [user.id]:true
                                         }))                                
