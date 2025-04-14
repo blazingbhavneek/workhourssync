@@ -1,6 +1,20 @@
 'use client'
 import { useState, useEffect } from 'react'
 import QRCode from 'react-qr-code'
+import CryptoJS from 'crypto-js';
+
+const secretKey = 'your-secret-key';
+
+function encryptJSON(data) {
+  const ciphertext = CryptoJS.AES.encrypt(JSON.stringify(data), secretKey).toString();
+  return ciphertext;
+}
+
+function decryptJSON(ciphertext) {
+  const bytes = CryptoJS.AES.decrypt(ciphertext, secretKey);
+  const decryptedData = JSON.parse(bytes.toString(CryptoJS.enc.Utf8));
+  return decryptedData;
+}
 
 export default function DynamicQRCode() {
   const [value, setValue] = useState('');
@@ -11,11 +25,11 @@ export default function DynamicQRCode() {
       employeeId: 1234567890, // session.user.employeeId,
       expiry: Date.now() + 10000
     })
-    let qrCode = window.btoa(payload);
+    const qrCode = encryptJSON(payload);
     console.log(qrCode);
     setValue(qrCode);
   }
-  
+
   useEffect(() => {
     if(!isGeneratorOn) return;
     generate()
