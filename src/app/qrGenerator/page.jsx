@@ -3,7 +3,7 @@ import { useState, useEffect } from 'react'
 import QRCode from 'react-qr-code'
 import CryptoJS from 'crypto-js';
 
-const secretKey = 'your-secret-key';
+const secretKey = process.env.QR_SECRET;
 
 function encryptJSON(data) {
   const ciphertext = CryptoJS.AES.encrypt(JSON.stringify(data), secretKey).toString();
