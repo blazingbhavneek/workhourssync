@@ -60,14 +60,6 @@ const Users = () => {
           console.error(err);
         }
       };
-      
-      const handleDelete = async (id) => {
-        try {
-          await fetch(`/api/users`, { method: 'DELETE' });
-        } catch (err) {
-          console.error(err);
-        }
-      };
 
       const handleFieldChange = (id, field, value) => {
         setUsers((prev) =>
@@ -85,7 +77,7 @@ const Users = () => {
                 Users
             </div>
             
-            <div className='bg-transparent rounded-2xl font-extralight flex flex-col md:flex-row justify-around items-center w-full md:w-[90%] p-4 gap-4'>
+            <div className='bg-transparent rounded-2xl font-extralight flex flex-col md:flex-row justify-around items-center w-full md:w-[90%] p-4 gap-2.5'>
                 <div className='text-black text-2xl'>Filter:</div>
                 <input 
                     className='w-full bg-white text-black p-2 rounded-xl border-1'
@@ -93,23 +85,22 @@ const Users = () => {
                     value={employeeId || ""}
                     onChange={(e) => setEmployeeId(e.target.value)}
                 />
-                <div className='w-full flex gap-2'>
-                    <select 
-                        className=' w-full bg-white text-black p-2 rounded-xl border-1'
-                        value={role || ""}
-                        onChange={(e) => setRole(e.target.value)}
-                    >
-                        <option value="">All</option>
-                        <option value="ADMIN">Admin</option>
-                        <option value="EMPLOYEE">Employee</option>
-                    </select>
-                    <input 
-                        type='text'
-                        className='w-full bg-white text-black p-2 rounded-xl border-1'
-                        value={workLocationsParam || ""}
-                        onChange={(e) => setWorkLocationsParam(e.target.value)}
-                    />
-                </div>
+                <select 
+                    className=' w-full bg-white text-black p-2 rounded-xl border-1'
+                    value={role || ""}
+                    onChange={(e) => setRole(e.target.value)}
+                >
+                    <option value="">All</option>
+                    <option value="ADMIN">Admin</option>
+                    <option value="EMPLOYEE">Employee</option>
+                </select>
+                <input 
+                    type='text'
+                    className='w-full bg-white text-black p-2 rounded-xl border-1'
+                    placeholder='Work Location IDs'
+                    value={workLocationsParam || ""}
+                    onChange={(e) => setWorkLocationsParam(e.target.value)}
+                />
                 <button 
                     className='bg-blue-500 text-white p-2 rounded-xl min-w-[150px]'
                     onClick={() => {
@@ -186,8 +177,8 @@ const Users = () => {
                                 />) : user.workLocationId
                             }
                             </div>
-                            <div className="p-3 w-[10%]">{user.createdAt}</div>
-                            <div className="p-3 w-[10%]">{user.updatedAt}</div>
+                            <div className="p-3 w-[10%]">{user.createdAt.split('T')[0]}</div>
+                            <div className="p-3 w-[10%]">{user.updatedAt.split('T')[0]}</div>
                             <div className="p-3 w-[10%] flex flex-col">
                             {
                                 isAdmin ? (
@@ -195,7 +186,6 @@ const Users = () => {
                                         <button 
                                         style={{backgroundColor: editItems[user.id] ? "#0377e2" : "#dadada"}}
                                         onClick={() => handleUpdate(user)} className="mb-1 bg-blue-500 text-white px-2 py-1">Update</button>
-                                        <button onClick={() => handleDelete(user.id)} className="bg-red-500 text-white px-2 py-1">Delete</button>
                                     </>
                                 ) : "-"
                             }
