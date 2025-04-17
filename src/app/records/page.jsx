@@ -6,7 +6,7 @@ import { useState, useEffect, useMemo } from 'react';
 const Records = () => {
     const [recordItems, setRecordItems] = useState([]);
     const [isAdmin, setIsAdmin] = useState(false);
-    const [editableTimes, setEditableTimes] = useState({});
+    const [editItems, setEditItems] = useState({});
 
     useEffect(() => {
         // Check user role from JWT
@@ -22,87 +22,178 @@ const Records = () => {
         setIsAdmin(true);
     }, []);
 
-    useEffect(() => {
-        fetch('/toy_records.json') // Replace with your actual API endpoint
+    const fetchData = () => {
+        fetch('/api/records') // Replace with your actual API endpoint
             .then(response => response.json())
             .then(data => {
                 setRecordItems(data);
+                console.log(data);
             })
             .catch(error => {
                 console.error('Error loading records:', error);
             });
-    }, []);
-
-    const processedData = useMemo(() => {
-        const groupedData = Object.values(
-            recordItems.reduce((acc, item) => {
-                if (!acc[item.date]) {
-                    acc[item.date] = { date: item.date, checkInTime: '', checkOutTime: '' };
-                }
-                if (item.checkInTime) {
-                    acc[item.date].checkInTime = item.checkInTime;
-                } else {
-                    acc[item.date].checkOutTime = item.checkOutTime;
-                }
-                return acc;
-            }, {})
-        );
-        return groupedData.sort((a, b) => new Date(b.date) - new Date(a.date));
-    }, [recordItems]);
+    }
 
     useEffect(() => {
-        // Initialize editable times when data loads
-        if (processedData.length > 0) {
-            const initialTimes = {};
-            processedData.forEach(item => {
-                initialTimes[item.date] = {
-                    checkInTime: item.checkInTime,
-                    checkOutTime: item.checkOutTime
-                };
-            });
-            setEditableTimes(initialTimes);
-        }
-    }, [processedData]);
+        fetchData();
+    }, []);
 
-    const handleTimeChange = (date, field, value) => {
-        setEditableTimes(prev => ({
-            ...prev,
-            [date]: {
-                ...prev[date],
-                [field]: value
-            }
-        }));
-    };
 
-    const handleSave = async (date) => {
+    const handleUpdate = async (record) => {
         try {
-            const response = await fetch('/api/records/update', { // Replace with your update endpoint
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'Authorization': `Bearer ${localStorage.getItem('token')}`
-                },
-                body: JSON.stringify({
-                    date,
-                    ...editableTimes[date]
-                })
-            });
+          await fetch('/api/records', {
+            method: 'PUT',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(record),
+          });
 
-            if (!response.ok) throw new Error('Update failed');
-            
-            // Refresh data after successful update
-            const newData = await response.json();
-            setRecordItems(newData);
-        } catch (error) {
-            console.error('Error updating record:', error);
+          setEditItems((prev) => ({
+            ...prev, [record.id]:false
+        })) 
+
+        fetchData();
+
+        } catch (err) {
+          console.error(err);
         }
-    };
+      };
+
+    const handleFieldChange = (id, field, value) => {
+        setRecordItems((prev) =>
+          prev.map((record) =>
+            record.id === id ? { ...record, [field]: value } : record
+          )
+        );
+      };
 
     return (
         <div className="w-screen h-full bg-white font-black flex flex-col justify-around gap-5 items-center">
             <div className='p-2.5 bg-[#b20303] text-white text-5xl flex flex-row justify-center items-center w-full h-auto'>
                 Records
             </div>
+
+
+            <div className='text-gray-800 text-sm max-h-[600px] bg-transparent overflow-scroll flex flex-col  w-[98%] md:w-[90%]'>
+                <div className="min-w-[1500px] h-auto flex flex-col">
+                        {/* Table Header */}
+                        <div className="bg-[#0377e2] flex flex-row justify-around items-center p-2.5 text-white text-center">
+                            <div className="p-3 w-[10%]">Work Location ID</div>
+                            <div className="p-3 w-[10%]">Auth Method</div>
+                            <div className="p-3 w-[10%]">Check In Time</div>
+                            <div className="p-3 w-[10%]">Check Out Time</div>
+                            <div className="p-3 w-[10%]">IP Address</div>
+                            <div className="p-3 w-[10%]">Is Late</div>
+                            <div className="p-3 w-[30%]">Comments</div>
+                            <div className="p-3 w-[10%]">Actions</div>
+                        </div>
+
+                        {/* Table Rows */}
+                        {recordItems.map((record, index) => (
+                        <div
+                            key={record.id}
+                            className="flex flex-row items-center justify-around w-full text-center"
+                            style={{ backgroundColor: index % 2 ? '#fff' : '#dadada' }}
+                        >
+                            <div className="p-3 w-[10%]">{record.workLocationId}</div>
+                            <div className="p-3 w-[10%]">{record.authMethod}</div>
+                            <div className="p-3 w-[10%]">
+                                {isAdmin ? (
+                                    <input
+                                        type="text"
+                                        value={record.checkInTime || ''}
+                                        onChange={(e) => {
+                                            let inputText = e.target.value
+                                            handleFieldChange(record.id, 'checkInTime', inputText);
+                                            setEditItems((prev) => ({
+                                                ...prev, [record.id]:true
+                                            }))                                
+                                        }}
+                                        className="w-full bg-white text-black p-1 rounded border-1 border-[#b8b8b8] text-center"
+                                    />
+                                ) : (
+                                    record.checkInTime || '--'
+                                )}
+                            </div>
+                            <div className="p-3 w-[10%]">
+                                {isAdmin ? (
+                                    <input
+                                        type="text"
+                                        value={record.checkOutTime || ''}
+                                        onChange={(e) => {
+                                            let inputText = e.target.value
+                                            handleFieldChange(record.id, 'checkOutTime', inputText);
+                                            setEditItems((prev) => ({
+                                                ...prev, [record.id]:true
+                                            }))
+                                        }}
+                                        className="w-full bg-white text-black p-1 rounded border-1 border-[#b8b8b8] text-center"
+                                    />
+                                ) : (
+                                    record.checkOutTime || '--'
+                                )}
+                            </div>
+                            <div className="p-3 w-[10%]">{record.ipAddress}</div>
+                            <div className="p-3 w-[10%]">
+                            {isAdmin ? (
+                                    <select 
+                                        className=' bg-white p-2 rounded-xl border-1 border-gray-300'
+                                        value={record.isLate}
+                                        onChange={(e) => {
+                                            handleFieldChange(record.id, 'isLate', e.target.value);
+                                            setEditItems((prev) => ({
+                                                ...prev, [record.id]:true
+                                            }))
+                                        }}
+                                    >
+                                        <option value="true">True</option>
+                                        <option value="false">False</option>
+                                    </select>
+                                ) : (
+                                    record.isLate || '--'
+                                )}
+                                </div>
+                            <div className="p-3 w-[30%]">
+                            {isAdmin ? (
+                                    <input
+                                        type="text"
+                                        value={record.comments || ''}
+                                        onChange={(e) => {
+                                            let inputText = e.target.value
+                                            handleFieldChange(record.id, 'comments', inputText);
+                                            setEditItems((prev) => ({
+                                                ...prev, [record.id]:true
+                                            }))
+                                        }}
+                                        className="w-full bg-white text-black p-1 rounded border-1 border-[#b8b8b8] text-center"
+                                    />
+                                ) : (
+                                    record.comments || '--'
+                                )}
+                            </div>
+                            <div className="p-3 w-[10%] flex flex-col">
+                            {
+                                isAdmin ? (
+                                    <>
+                                        <button 
+                                        style={{backgroundColor: editItems[record.id] ? "#0377e2" : "#dadada"}}
+                                        onClick={() => handleUpdate(record)} className="mb-1 bg-blue-500 text-white px-2 py-1">Update</button>
+                                    </>
+                                ) : "-"
+                            }
+                            </div>
+                        </div>
+                        ))}
+                </div>
+            </div>
+
+
+
+
+
+
+
+{/* 
+
             <div className='bg-transparent rounded-2xl font-extralight flex md:flex-row flex-col justify-around items-center md:w-[90%] w-full h-auto p-2.5 gap-2.5'>
                 <div className='text-black text-2xl'>Filter:</div>
                 {isAdmin && (
@@ -165,7 +256,7 @@ const Records = () => {
                         </div>
                     ))}
                 </div>
-            </div>
+            </div> */}
         </div>
     )
 }
