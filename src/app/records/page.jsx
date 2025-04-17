@@ -10,14 +10,16 @@ const Records = () => {
     const [employeeId, setEmployeeId] = useState("");
     const [startDate, setStartDate] = useState("");
     const [endDate, setEndDate] = useState("");
-    const [workLocationsParam, setWorkLocationsParam] = useState("");
 
     const [filters, setFilters] = useState({
         employeeId: "",
         startDate: "",
         endDate: "",
-        workLocationsParam: ""
     });
+
+    useEffect(()=>{
+        fetchData()
+    }, [filters])
 
     useEffect(() => {
         // Check user role from JWT
@@ -31,23 +33,28 @@ const Records = () => {
         //     }
         // }
         setIsAdmin(true);
+        fetchData();
     }, []);
 
     const fetchData = () => {
-        fetch('/api/records') // Replace with your actual API endpoint
+        const query = new URLSearchParams(
+            Object.fromEntries(
+                Object.entries(filters).filter(([_, v]) => v != null && v !== "")
+            )
+        ).toString();
+        
+        const url = query ? `/api/records?${query}` : '/api/records';
+        // console.log(url);
+        fetch(url) 
             .then(response => response.json())
             .then(data => {
                 setRecordItems(data);
-                console.log(data);
+                // console.log(data);
             })
             .catch(error => {
                 console.error('Error loading records:', error);
             });
     }
-
-    useEffect(() => {
-        fetchData();
-    }, []);
 
 
     const handleUpdate = async (record) => {
@@ -78,21 +85,35 @@ const Records = () => {
       };
 
     return (
-        <div className="w-screen h-full bg-white font-black flex flex-col justify-around gap-5 items-center">
-            <div className='p-2.5 bg-[#b20303] text-white text-5xl flex flex-row justify-center items-center w-full h-auto'>
+        <div className="w-screen min-h-screen bg-white font-black flex flex-col justify-start gap-5 items-center">
+            <div className='absolute top-0 z-50 left-0 p-2.5 bg-[#b20303] text-white text-5xl flex flex-row justify-center items-center w-full h-auto'>
                 Records
             </div>
-
+            <div className='bg-transparent h-[120px] w-full'></div>
             <div className='bg-transparent rounded-2xl font-extralight flex md:flex-row flex-col justify-around items-center md:w-[90%] w-full h-auto p-2.5 gap-2.5'>
                 <div className='text-black text-2xl'>Filter:</div>
                 {isAdmin && (
-                    <input className='border-1 w-full bg-white text-black p-2 rounded-xl' placeholder='Employee ID'/>
+                    <input 
+                    onChange={(e)=>setEmployeeId(e.target.value)}
+                    className='border-1 w-full bg-white text-black p-2 rounded-xl' placeholder='Employee ID'/>
                 )}
                 <div className='w-full flex md:flex-row flex-col gap-1 justify-around items-center'>
-                    <input type='date' className='border-1 md:w-[48%] w-full bg-white text-black p-2 rounded-xl' placeholder='Start Date'/>
-                    <input type='date' className='border-1 md:w-[48%] w-full bg-white text-black p-2 rounded-xl' placeholder='End Date'/>
+                    <input 
+                    onChange={(e)=>setStartDate(e.target.value)}
+                    type='date' className='border-1 md:w-[48%] w-full bg-white text-black p-2 rounded-xl' placeholder='Start Date'/>
+                    <input 
+                    onChange={(e)=>setEndDate(e.target.value)}
+                    type='date' className='border-1 md:w-[48%] w-full bg-white text-black p-2 rounded-xl' placeholder='End Date'/>
                 </div>
-                <button className='bg-[#0377e2] hover:bg-[#0057a6] p-2 md:min-w-[150px] min-w-full rounded-xl text-white'>Search</button>
+                <button 
+                onClick={() => {
+                    setFilters({
+                        employeeId,
+                        startDate,
+                        endDate,
+                    });
+                }}
+                className='bg-[#0377e2] hover:bg-[#0057a6] p-2 md:min-w-[150px] min-w-full rounded-xl text-white'>Search</button>
             </div>
 
             <div className='text-gray-800 text-sm max-h-[600px] bg-transparent overflow-scroll flex flex-col  w-[98%] md:w-[90%]'>

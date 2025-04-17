@@ -16,21 +16,30 @@ export async function GET(request: NextRequest) {
     // Extract query parameters from the URL
     const { searchParams } = new URL(request.url);
     const employeeId = searchParams.get('employeeId');
-    // const startDate = searchParams.get('startDate');
-    // const endDate = searchParams.get('endDate');
+    const startDate = searchParams.get('startDate');
+    const endDate = searchParams.get('endDate');
 
     let query = supabase.from('Attendance').select('*');
 
     if (employeeId) {
-      const employeeNumber = Number(employeeId);
-      if (isNaN(employeeNumber)) {
-        return NextResponse.json(
-          { error: 'Employee ID must be a valid number' },
-          { status: 400 }
-        );
-      }
-      query = query.eq('employeeNumber', employeeNumber);
+        const employeeNumber = Number(employeeId);
+        if (isNaN(employeeNumber)) {
+            return NextResponse.json(
+            { error: 'Employee ID must be a valid number' },
+            { status: 400 }
+            );
+        }
+        query = query.eq('employeeNumber', employeeNumber);
     }
+
+    if (startDate) {
+        query = query.gte('checkInTime', startDate);
+    }
+
+    if (endDate) {
+        query = query.lte('checkInTime', endDate);
+    }
+
 
     const { data: records, error: userError } = await query;
 
