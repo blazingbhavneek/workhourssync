@@ -7,6 +7,17 @@ const Records = () => {
     const [recordItems, setRecordItems] = useState([]);
     const [isAdmin, setIsAdmin] = useState(false);
     const [editItems, setEditItems] = useState({});
+    const [employeeId, setEmployeeId] = useState("");
+    const [startDate, setStartDate] = useState("");
+    const [endDate, setEndDate] = useState("");
+    const [workLocationsParam, setWorkLocationsParam] = useState("");
+
+    const [filters, setFilters] = useState({
+        employeeId: "",
+        startDate: "",
+        endDate: "",
+        workLocationsParam: ""
+    });
 
     useEffect(() => {
         // Check user role from JWT
@@ -72,6 +83,17 @@ const Records = () => {
                 Records
             </div>
 
+            <div className='bg-transparent rounded-2xl font-extralight flex md:flex-row flex-col justify-around items-center md:w-[90%] w-full h-auto p-2.5 gap-2.5'>
+                <div className='text-black text-2xl'>Filter:</div>
+                {isAdmin && (
+                    <input className='border-1 w-full bg-white text-black p-2 rounded-xl' placeholder='Employee ID'/>
+                )}
+                <div className='w-full flex md:flex-row flex-col gap-1 justify-around items-center'>
+                    <input type='date' className='border-1 md:w-[48%] w-full bg-white text-black p-2 rounded-xl' placeholder='Start Date'/>
+                    <input type='date' className='border-1 md:w-[48%] w-full bg-white text-black p-2 rounded-xl' placeholder='End Date'/>
+                </div>
+                <button className='bg-[#0377e2] hover:bg-[#0057a6] p-2 md:min-w-[150px] min-w-full rounded-xl text-white'>Search</button>
+            </div>
 
             <div className='text-gray-800 text-sm max-h-[600px] bg-transparent overflow-scroll flex flex-col  w-[98%] md:w-[90%]'>
                 <div className="min-w-[1500px] h-auto flex flex-col">
@@ -79,11 +101,12 @@ const Records = () => {
                         <div className="bg-[#0377e2] flex flex-row justify-around items-center p-2.5 text-white text-center">
                             <div className="p-3 w-[10%]">Work Location ID</div>
                             <div className="p-3 w-[10%]">Auth Method</div>
+                            <div className="p-3 w-[10%]">Date</div>
                             <div className="p-3 w-[10%]">Check In Time</div>
                             <div className="p-3 w-[10%]">Check Out Time</div>
                             <div className="p-3 w-[10%]">IP Address</div>
                             <div className="p-3 w-[10%]">Is Late</div>
-                            <div className="p-3 w-[30%]">Comments</div>
+                            <div className="p-3 w-[20%]">Comments</div>
                             <div className="p-3 w-[10%]">Actions</div>
                         </div>
 
@@ -96,14 +119,15 @@ const Records = () => {
                         >
                             <div className="p-3 w-[10%]">{record.workLocationId}</div>
                             <div className="p-3 w-[10%]">{record.authMethod}</div>
+                            <div className="p-3 w-[10%]">{record.checkInTime.split('T')[0]}</div>
                             <div className="p-3 w-[10%]">
                                 {isAdmin ? (
                                     <input
                                         type="text"
-                                        value={record.checkInTime || ''}
+                                        value={record.checkInTime.split('T')[1] || ''}
                                         onChange={(e) => {
                                             let inputText = e.target.value
-                                            handleFieldChange(record.id, 'checkInTime', inputText);
+                                            handleFieldChange(record.id, 'checkInTime', record.checkInTime.split('T')[0] + 'T' + inputText);
                                             setEditItems((prev) => ({
                                                 ...prev, [record.id]:true
                                             }))                                
@@ -118,10 +142,10 @@ const Records = () => {
                                 {isAdmin ? (
                                     <input
                                         type="text"
-                                        value={record.checkOutTime || ''}
+                                        value={record.checkOutTime ? record.checkOutTime.split('T')[1] : ''}
                                         onChange={(e) => {
                                             let inputText = e.target.value
-                                            handleFieldChange(record.id, 'checkOutTime', inputText);
+                                            handleFieldChange(record.id, 'checkOutTime', record.checkInTime.split('T')[0] + 'T' + inputText);
                                             setEditItems((prev) => ({
                                                 ...prev, [record.id]:true
                                             }))
@@ -152,7 +176,7 @@ const Records = () => {
                                     record.isLate || '--'
                                 )}
                                 </div>
-                            <div className="p-3 w-[30%]">
+                            <div className="p-3 w-[20%]">
                             {isAdmin ? (
                                     <input
                                         type="text"
@@ -194,17 +218,7 @@ const Records = () => {
 
 {/* 
 
-            <div className='bg-transparent rounded-2xl font-extralight flex md:flex-row flex-col justify-around items-center md:w-[90%] w-full h-auto p-2.5 gap-2.5'>
-                <div className='text-black text-2xl'>Filter:</div>
-                {isAdmin && (
-                    <input className='border-1 w-full bg-white text-black p-2 rounded-xl' placeholder='Employee ID'/>
-                )}
-                <div className='w-full flex md:flex-row flex-col gap-1 justify-around items-center'>
-                    <input type='date' className='border-1 md:w-[48%] w-full bg-white text-black p-2 rounded-xl' placeholder='Start Date'/>
-                    <input type='date' className='border-1 md:w-[48%] w-full bg-white text-black p-2 rounded-xl' placeholder='End Date'/>
-                </div>
-                <button className='bg-[#0377e2] hover:bg-[#0057a6] p-2 md:min-w-[150px] min-w-full rounded-xl text-white'>Search</button>
-            </div>
+            
             
             <div className='overflow-hidden flex flex-col justify-center items-center md:w-[90%] w-full max-h-[600px] text-gray-800'>
                 <div className="flex flex-col justify-between overflow-scroll w-full h-auto border-solid border-1 border-gray-400">
