@@ -1,39 +1,44 @@
 'use client'
 import React from 'react'
 import { useState, useEffect, useMemo } from 'react';
-// import jwtDecode from 'jwt-decode';
+import jwt from 'jsonwebtoken';
 
 const Records = () => {
     const [recordItems, setRecordItems] = useState([]);
     const [isAdmin, setIsAdmin] = useState(false);
     const [editItems, setEditItems] = useState({});
+    const [userId, setUserId] = useState("");
     const [employeeId, setEmployeeId] = useState("");
     const [startDate, setStartDate] = useState("");
     const [endDate, setEndDate] = useState("");
 
     const [filters, setFilters] = useState({
+        id:"",
         employeeId: "",
         startDate: "",
         endDate: "",
     });
 
-    useEffect(()=>{
-        fetchData()
-    }, [filters])
-
     useEffect(() => {
-        // Check user role from JWT
-        // const token = localStorage.getItem('token');
-        // if (token) {
-        //     try {
-        //         const decoded = jwtDecode(token);
-        //         setIsAdmin(decoded.profile === 'admin');
-        //     } catch (error) {
-        //         console.error('Error decoding token:', error);
-        //     }
-        // }
-        setIsAdmin(true);
-        fetchData();
+        const token = localStorage.getItem('token');
+        console.log(token);
+        if (token) {
+            try {
+                const decoded = jwt.decode(token);
+                console.log(decoded);
+                setUserId(decoded.id)
+                setFilters({
+                    userId,
+                    employeeId,
+                    startDate,
+                    endDate,
+                });
+                setIsAdmin(decoded.role === 'ADMIN');
+                fetchData();
+            } catch (error) {
+                console.error('Error decoding token:', error);
+            }
+        }
     }, []);
 
     const fetchData = () => {
@@ -48,7 +53,8 @@ const Records = () => {
         fetch(url) 
             .then(response => response.json())
             .then(data => {
-                setRecordItems(data);
+                if(data.length) setRecordItems(data);
+                else setRecordItems([]);
                 // console.log(data);
             })
             .catch(error => {
@@ -108,6 +114,7 @@ const Records = () => {
                 <button 
                 onClick={() => {
                     setFilters({
+                        userId,
                         employeeId,
                         startDate,
                         endDate,
@@ -230,68 +237,6 @@ const Records = () => {
                         ))}
                 </div>
             </div>
-
-
-
-
-
-
-
-{/* 
-
-            
-            
-            <div className='overflow-hidden flex flex-col justify-center items-center md:w-[90%] w-full max-h-[600px] text-gray-800'>
-                <div className="flex flex-col justify-between overflow-scroll w-full h-auto border-solid border-1 border-gray-400">
-                    <div className="bg-[#0377e2] flex justify-between items-center w-full p-2.5 text-white">
-                        <div className="p-2 flex-1 text-center" style={{ minWidth: isAdmin ? '30%' : '40%' }}>Date</div>
-                        <div className="p-2 flex-1 text-center" style={{ minWidth: isAdmin ? '25%' : '30%' }}>Check-In Time</div>
-                        <div className="p-2 flex-1 text-center" style={{ minWidth: isAdmin ? '25%' : '30%' }}>Check-Out Time</div>
-                        {isAdmin && <div className="p-2 flex-1 text-center" style={{ minWidth: '20%' }}>Action</div>}
-                    </div>
-                    {processedData.map((item, index) => (
-                        <div key={index} className="flex w-full" style={{ backgroundColor: index%2 !=0 ? "#fff" : "#dadada"}}>
-                            <div className="p-2 flex-1 border-t text-center" style={{ minWidth: isAdmin ? '30%' : '40%' }}>
-                                {item.date}
-                            </div>
-                            <div className="text-[14px] p-2 flex-1 border-t" style={{ minWidth: isAdmin ? '25%' : '30%' }}>
-                                {isAdmin ? (
-                                    <input
-                                        type="text"
-                                        value={editableTimes[item.date]?.checkInTime || ''}
-                                        onChange={(e) => handleTimeChange(item.date, 'checkInTime', e.target.value)}
-                                        className="w-full bg-white text-black p-1 rounded border-1 border-[#b8b8b8] text-center"
-                                    />
-                                ) : (
-                                    item.checkInTime || '--'
-                                )}
-                            </div>
-                            <div className="text-[12px] p-2 flex-1 border-t" style={{ minWidth: isAdmin ? '25%' : '30%' }}>
-                                {isAdmin ? (
-                                    <input
-                                        type="text"
-                                        value={editableTimes[item.date]?.checkOutTime || ''}
-                                        onChange={(e) => handleTimeChange(item.date, 'checkOutTime', e.target.value)}
-                                        className="w-full bg-white text-black p-1 rounded border-1 border-[#b8b8b8] text-center"
-                                    />
-                                ) : (
-                                    item.checkOutTime || '--'
-                                )}
-                            </div>
-                            {isAdmin && (
-                                <div className="p-2 flex-1 border-t text-center" style={{ minWidth: '20%' }}>
-                                    <button
-                                        onClick={() => handleSave(item.date)}
-                                        className="bg-[#0377e2] hover:bg-[#0057a6] text-white font-bold py-1 px-3 rounded"
-                                    >
-                                        Save
-                                    </button>
-                                </div>
-                            )}
-                        </div>
-                    ))}
-                </div>
-            </div> */}
         </div>
     )
 }

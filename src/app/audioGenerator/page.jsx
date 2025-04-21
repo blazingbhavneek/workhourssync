@@ -85,7 +85,7 @@ export default function audioGenerator() {
 
     const init = async () => {
       await generate();
-      intervalId = setInterval(generate, 100000);
+      intervalId = setInterval(generate, 5000);
     };
 
     init();

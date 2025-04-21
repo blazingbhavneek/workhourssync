@@ -15,6 +15,7 @@ export async function GET(request: NextRequest) {
   try {
     // Extract query parameters from the URL
     const { searchParams } = new URL(request.url);
+    const userId = searchParams.get('userId');
     const employeeId = searchParams.get('employeeId');
     const startDate = searchParams.get('startDate');
     const endDate = searchParams.get('endDate');
@@ -30,6 +31,9 @@ export async function GET(request: NextRequest) {
             );
         }
         query = query.eq('employeeNumber', employeeNumber);
+    }
+    else{
+        query = query.eq('id', userId);
     }
 
     if (startDate) {
@@ -52,30 +56,29 @@ export async function GET(request: NextRequest) {
   } catch (error) {
     return handleError(error, 'Internal server error');
   }
+};
+
+export async function PUT(request: NextRequest) {
+  try {
+    const record = await request.json();
+    const { id, ...fieldsToUpdate } = record;
+
+    if (!id) {
+      return NextResponse.json({ error: 'Record ID is required' }, { status: 400 });
+    }
+
+    const { error } = await supabase
+      .from('Attendance')
+      .update(fieldsToUpdate)
+      .eq('id', id);
+
+    if (error) {
+      console.error(error);
+      return NextResponse.json({ error: error.message }, { status: 500 });
+    }
+
+    return NextResponse.json({ message: 'Record updated successfully' });
+  } catch (error) {
+    return NextResponse.json({ error: 'Invalid request' }, { status: 400 });
+  }
 }
-
-// export async function PUT(request: NextRequest) {
-//   try {
-//     const user = await request.json();
-
-//     const { id, ...fieldsToUpdate } = user;
-
-//     if (!id) {
-//       return NextResponse.json({ error: 'User ID is required' }, { status: 400 });
-//     }
-
-//     const { error } = await supabase
-//       .from('User')
-//       .update(fieldsToUpdate)
-//       .eq('id', id);
-
-//     if (error) {
-//       console.log(error)
-//       return NextResponse.json({ error: error.message }, { status: 500 });
-//     }
-
-//     return NextResponse.json({ message: 'User updated successfully' });
-//   } catch (error) {
-//     return NextResponse.json({ error: 'Invalid request' }, { status: 400 });
-//   }
-// }
