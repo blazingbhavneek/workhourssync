@@ -19,18 +19,46 @@ function decryptJSON(ciphertext) {
 export default function DynamicQRCode() {
   const [value, setValue] = useState('');
   const [isGeneratorOn, setIsGeneratorOn] = useState(false);
+  const [userId, setUserId] = useState();
+  const [isAdmin, setIsAdmin] = useState(false)
 
-  const generate = () => {
-    const payload = JSON.stringify({
-      employeeId: 1234567890, // session.user.employeeId,
-      expiry: Date.now() + 10000
-    })
-    const qrCode = encryptJSON(payload);
-    console.log(qrCode);
-    setValue(qrCode);
+  useEffect(() => {
+    const token = localStorage.getItem('token');
+    if (token) {
+        try {
+            const decoded = jwt.decode(token);
+            console.log(decoded)
+            setUserId(decoded.id)
+            setIsAdmin(decoded.role === 'ADMIN');
+        } catch (error) {
+            console.error('Error decoding token:', error);
+        }
+    }
+}, []);
+
+  const generate = async () => {
+    try {
+      const res = await fetch('/api/auth/codeGen', {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({userId}),
+      });
+      const payload = JSON.stringify({
+        employeeNumber: res.employeeNumber, // session.user.employeeId,
+        expiry: Date.now() + 5000
+      })
+      const qrCode = encryptJSON(payload);
+      console.log(qrCode);
+      setValue(qrCode);
+    }
+
+    catch (err){
+      console.log(err);
+    }
   }
 
   useEffect(() => {
+    if(!isAdmin) return;
     if(!isGeneratorOn) return;
     generate()
     const id = setInterval(generate, 2000)
@@ -38,25 +66,35 @@ export default function DynamicQRCode() {
   }, [isGeneratorOn])
 
   return <div className='bg-white flex flex-col justify-center items-center h-screen w-screen'>
-            <div className='absolute top-0 left-0 text-center text-white bg-[#b20303] text-5xl flex flex-row justify-center items-center w-full h-auto p-3.5'>
-                Generate QR Code
-            </div>
+            {
+              isAdmin ? 
+                  <>
+                      <div className='absolute top-0 left-0 text-center text-white bg-[#b20303] text-5xl flex flex-row justify-center items-center w-full h-auto p-3.5'>
+                      Generate QR Code
+                      </div>
 
-            {!isGeneratorOn ? (
-                    <button 
-                    className='w-[100px] p-3 bg-[#0057A6] rounded-2xl'
-                    onClick={() => setIsGeneratorOn(true)}>
-                    Start
-                </button>
-            ) : 
-                <div className='flex flex-col justify-around items-center gap-2.5'>
-                    <QRCode value={value} />
-                    <button 
-                    className='w-[100px] p-3 bg-[#0057A6]'
-                    onClick={() => setIsGeneratorOn(false)}>
-                        Stop
-                    </button>
+                      {!isGeneratorOn ? (
+                              <button 
+                              className='w-[100px] p-3 bg-[#0057A6] rounded-2xl'
+                              onClick={() => setIsGeneratorOn(true)}>
+                              Start
+                          </button>
+                      ) : 
+                          <div className='flex flex-col justify-around items-center gap-2.5'>
+                              <QRCode value={value} />
+                              <button 
+                              className='w-[100px] p-3 bg-[#0057A6]'
+                              onClick={() => setIsGeneratorOn(false)}>
+                                  Stop
+                              </button>
+                          </div>
+                      }
+                  </>
+                :
+                <div className='absolute top-1/2 left-0 text-center text-white bg-[#b20303] text-5xl flex flex-row justify-center items-center w-full h-auto p-3.5'>
+                  Only Admins allowed on this Page!!
                 </div>
             }
+            
         </div>;
 }
