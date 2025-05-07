@@ -71,8 +71,8 @@ export default function audioGenerator() {
     const arr = payload.split('').map(Number);
     
     for (let i = 0; i < arr.length; i++) {
-      if(i && arr[i]===arr[i-1]) await transmitterRef.current.playDigit('g', 0.1);
-      await transmitterRef.current.playDigit(arr[i], 0.1);
+      if(i && arr[i]===arr[i-1]) await transmitterRef.current.playDigit('g', 0.15);
+      await transmitterRef.current.playDigit(arr[i], 0.15);
       await sleep(10); // Add gap between digits
     }
   }

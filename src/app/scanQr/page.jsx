@@ -18,7 +18,7 @@ const CameraScanner = () => {
       if (token) {
           try {
               const decoded = jwt.decode(token);
-              setUserId(2)
+              setUserId(decoded.id)
               setIsAdmin(decoded.role === 'ADMIN');
           } catch (error) {
               console.error('Error decoding token:', error);

@@ -187,10 +187,18 @@ export default function DTMFReceiver() {
         }
       });
       
-      // Set up media recorder
-      mediaRecorderRef.current = new MediaRecorder(stream, {
-        mimeType: 'audio/webm'
-      });
+      // before starting MediaRecorder
+      let options;
+      if (MediaRecorder.isTypeSupported('audio/webm;codecs=opus')) {
+        options = { mimeType: 'audio/webm;codecs=opus' };
+      } else if (MediaRecorder.isTypeSupported('audio/mp4;codecs=aac')) {
+        options = { mimeType: 'audio/mp4;codecs=aac' };
+      } // else leave options undefined
+
+      mediaRecorderRef.current = options
+        ? new MediaRecorder(stream, options)
+        : new MediaRecorder(stream);
+
       
       // Handle data as it comes in
       mediaRecorderRef.current.ondataavailable = (event) => {
