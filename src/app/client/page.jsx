@@ -9,41 +9,38 @@ export default function ClientPage() {
 
   const iceServers = {
     iceServers: [
-      // Google public STUN endpoints
-      { urls: 'stun:stun.l.google.com:19302' },
-      { urls: 'stun:stun.l.google.com:5349' },
-      { urls: 'stun:stun1.l.google.com:3478' },
-      { urls: 'stun:stun1.l.google.com:5349' },
-      { urls: 'stun:stun2.l.google.com:19302' },
-      { urls: 'stun:stun2.l.google.com:5349' },
-      { urls: 'stun:stun3.l.google.com:3478' },
-      { urls: 'stun:stun3.l.google.com:5349' },
-      { urls: 'stun:stun4.l.google.com:19302' },
-  
-      // Other free public STUN servers
-      { urls: 'stun:stun.12connect.com:3478' },
-      { urls: 'stun:stun.12voip.com:3478' },
-      { urls: 'stun:stun.1und1.de:3478' },
-      { urls: 'stun:stun.3cx.com:3478' },
-      { urls: 'stun:stun.acrobits.cz:3478' },
-      { urls: 'stun:stun.actionvoip.com:3478' },
-      { urls: 'stun:stun.advfn.com:3478' },
-      { urls: 'stun:stun.altar.com.pl:3478' },
-      { urls: 'stun:stun.antisip.com:3478' },
-      { urls: 'stun:stun.avigora.fr:3478' },
-      { urls: 'stun:stun.bluesip.net:3478' },
-      { urls: 'stun:iphone-stun.strato-iphone.de:3478' },
-      { urls: 'stun:numb.viagenie.ca:3478' },
-      { urls: 'stun:stun.cloudflare.com:3478' },
-      { urls: 'stun:stun.flashdance.cx:3478' },
-      { urls: 'stun:stunserver2024.stunprotocol.org:3478' },
-      { urls: 'stun:stun.freestun.net:3478' }
-    ],
+      { urls: "stun:stun.l.google.com:19302" },
+      { urls: "stun:stun.l.google.com:5349" },
+      { urls: "stun:stun1.l.google.com:3478" },
+      {
+        urls: "stun:stun.relay.metered.ca:80",
+      },
+      {
+        urls: "turn:global.relay.metered.ca:80",
+        username: "75700a6e7761f0c4540a170a",
+        credential: "vJHVkZyfaTp/M/nQ",
+      },
+      {
+        urls: "turn:global.relay.metered.ca:80?transport=tcp",
+        username: "75700a6e7761f0c4540a170a",
+        credential: "vJHVkZyfaTp/M/nQ",
+      },
+      {
+        urls: "turn:global.relay.metered.ca:443",
+        username: "75700a6e7761f0c4540a170a",
+        credential: "vJHVkZyfaTp/M/nQ",
+      },
+      {
+        urls: "turns:global.relay.metered.ca:443?transport=tcp",
+        username: "75700a6e7761f0c4540a170a",
+        credential: "vJHVkZyfaTp/M/nQ",
+      },
+  ],
     iceTransportPolicy: 'all'
   };
 
   useEffect(() => {
-    const ws = new WebSocket('wss://192.168.188.157:8080');
+    const ws = new WebSocket('wss://192.168.3.157:8080');
     wsRef.current = ws;
 
     ws.onopen = () => {
@@ -60,6 +57,11 @@ export default function ClientPage() {
           return;
         }
 
+        if (msg.type === 'ice-candidate') {
+          const candidate = new RTCIceCandidate(msg.candidate);
+          pcRef.current?.addIceCandidate(candidate).catch(console.error);
+        }
+
         if (msg.type === 'offer') {
           setStatus('Received offer - creating answer');
           const pc = new RTCPeerConnection(iceServers);
@@ -69,8 +71,15 @@ export default function ClientPage() {
             if (e.candidate) {
               console.log('New ICE candidate:', e.candidate);
               setIceState(prev => `${prev}\nCandidate: ${e.candidate.candidate}`);
+              // Send ICE candidate to admin
+              wsRef.current?.send(JSON.stringify({
+                type: 'ice-candidate',
+                candidate: e.candidate,
+                target: 'admin'
+              }));
             }
           };
+          
 
           pc.oniceconnectionstatechange = () => {
             setStatus(`ICE state: ${pc.iceConnectionState}`);
