@@ -3,19 +3,17 @@ import { useState, useRef, useEffect } from 'react';
 
 export default function AdminPage() {
   const [status, setStatus] = useState('Disconnected');
-  const [result, setResult] = useState(null);
   const [iceState, setIceState] = useState('');
+  const [nearbyDevices, setNearbyDevices] = useState([]);
   const wsRef = useRef(null);
-  const pcRef = useRef(null);
+  const peerConnectionsRef = useRef(new Map()); // clientId -> { pc, dc }
 
   const iceServers = {
     iceServers: [
       { urls: "stun:stun.l.google.com:19302" },
       { urls: "stun:stun.l.google.com:5349" },
       { urls: "stun:stun1.l.google.com:3478" },
-      {
-        urls: "stun:stun.relay.metered.ca:80",
-      },
+      { urls: "stun:stun.relay.metered.ca:80" },
       {
         urls: "turn:global.relay.metered.ca:80",
         username: "75700a6e7761f0c4540a170a",
@@ -36,10 +34,9 @@ export default function AdminPage() {
         username: "75700a6e7761f0c4540a170a",
         credential: "vJHVkZyfaTp/M/nQ",
       },
-  ],
+    ],
     iceTransportPolicy: 'all'
   };
-  
 
   useEffect(() => {
     const ws = new WebSocket('wss://192.168.3.157:8080');
@@ -59,20 +56,40 @@ export default function AdminPage() {
           return;
         }
 
+        if (msg.type === 'new-client') {
+          const clientId = msg.id;
+          startConnection(clientId);
+          return;
+        }
+
         if (msg.type === 'ice-candidate') {
+          const clientId = msg.senderId;
+          const pcData = peerConnectionsRef.current.get(clientId);
+          if (!pcData) return;
           const candidate = new RTCIceCandidate(msg.candidate);
-          pcRef.current?.addIceCandidate(candidate).catch(console.error);
+          pcData.pc.addIceCandidate(candidate).catch(console.error);
         }
 
         if (msg.type === 'answer') {
-          if (!pcRef.current) return;
-          
-          await pcRef.current.setRemoteDescription(new RTCSessionDescription(msg.answer));
-          setStatus('Remote description set');
+          const clientId = msg.senderId;
+          const pcData = peerConnectionsRef.current.get(clientId);
+          if (!pcData) return;
+          await pcData.pc.setRemoteDescription(new RTCSessionDescription(msg.answer));
+          setStatus(`Remote description set for ${clientId}`);
+        }
+
+        if (msg.type === 'client-disconnected') {
+          const clientId = msg.id;
+          const pcData = peerConnectionsRef.current.get(clientId);
+          if (pcData) {
+            pcData.pc.close();
+            peerConnectionsRef.current.delete(clientId);
+            setNearbyDevices(prev => prev.filter(d => d.id !== clientId));
+          }
         }
       } catch (error) {
         console.error('Message handling error:', error);
-        setStatus(`Error: ${error instanceof Error ? error.message : String(error)}`);
+        setStatus(`Error: ${error.message}`);
       }
     };
 
@@ -87,66 +104,64 @@ export default function AdminPage() {
     };
   }, []);
 
-  const startConnection = async () => {
+  const startConnection = async (clientId) => {
     try {
-      setStatus('Creating peer connection...');
+      setStatus(`Creating peer connection for ${clientId}...`);
       const pc = new RTCPeerConnection(iceServers);
-      pcRef.current = pc;
+      const dc = pc.createDataChannel(`proximity-${clientId}`);
+
+      peerConnectionsRef.current.set(clientId, { pc, dc });
 
       pc.onicecandidate = (e) => {
         if (e.candidate) {
-          console.log('New ICE candidate:', e.candidate);
-          setIceState(prev => `${prev}\nCandidate: ${e.candidate?.candidate}`);
-          // Send ICE candidate to client
+          setIceState(prev => `${prev}\nCandidate: ${e.candidate.candidate}`);
           wsRef.current?.send(JSON.stringify({
             type: 'ice-candidate',
             candidate: e.candidate,
-            target: 'client'
+            target: 'client',
+            targetId: clientId
           }));
-        } else {
-          setIceState(prev => `${prev}\nICE gathering complete`);
         }
       };
-            
 
       pc.oniceconnectionstatechange = () => {
-        setStatus(`ICE state: ${pc.iceConnectionState}`);
-        console.log('ICE connection state:', pc.iceConnectionState);
+        setStatus(`ICE state for ${clientId}: ${pc.iceConnectionState}`);
       };
 
-      pc.onconnectionstatechange = () => {
-        setStatus(`Connection state: ${pc.connectionState}`);
-      };
-
-      const dc = pc.createDataChannel('proximity');
       dc.onopen = () => {
-        setStatus('Data channel open - sending ping');
-        dc.send(JSON.stringify({ type: 'ping', timestamp: Date.now() }));
+        setStatus(`Data channel open for ${clientId}`);
       };
 
       dc.onmessage = (e) => {
         const data = JSON.parse(e.data);
-        if (data.type === 'pong') {
-          const rtt = Date.now() - data.timestamp;
-          setResult(rtt < 50 ? '✅ Devices are nearby!' : '❌ High latency detected');
-          setStatus(`Round-trip time: ${rtt}ms`);
+        if (data.type === 'ping') {
+          const timestamp = data.timestamp;
+          const rtt = Date.now() - timestamp;
+          dc.send(JSON.stringify({ type: 'pong', timestamp }));
+          setNearbyDevices(prev => {
+            const existing = prev.find(d => d.id === data.id);
+            return existing ? 
+              prev.map(d => d.id === data.id ? { ...d, rtt } : d) :
+              [...prev, { id: data.id, rtt }];
+          });
         }
       };
 
-      setStatus('Creating offer...');
+      setStatus(`Creating offer for ${clientId}...`);
       const offer = await pc.createOffer();
       await pc.setLocalDescription(offer);
       
       wsRef.current?.send(JSON.stringify({
         type: 'offer',
         offer: pc.localDescription,
-        target: 'client'
+        target: 'client',
+        targetId: clientId
       }));
       
-      setStatus('Offer sent to client');
+      setStatus(`Offer sent to client ${clientId}`);
     } catch (error) {
       console.error('Connection error:', error);
-      setStatus(`Error: ${error instanceof Error ? error.message : String(error)}`);
+      setStatus(`Error: ${error.message}`);
     }
   };
 
@@ -160,30 +175,19 @@ export default function AdminPage() {
             <span className="font-medium">Status:</span> {status}
           </div>
           
-          {result && (
-            <div className={`p-3 rounded-md ${
-              result.includes('✅') ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'
-            }`}>
-              {result}
-            </div>
-          )}
+          <div className="text-sm">
+            <span className="font-medium">Nearby Devices:</span>
+            {nearbyDevices.map(device => (
+              <div key={device.id} className="mt-2">
+                {device.id} - {device.rtt}ms {device.rtt < 50 ? '✅' : '❌'}
+              </div>
+            ))}
+          </div>
           
           <div className="text-xs bg-gray-50 p-2 rounded-md overflow-auto max-h-32">
             <pre>ICE State:{iceState}</pre>
           </div>
         </div>
-        
-        <button
-          onClick={startConnection}
-          disabled={!wsRef.current || wsRef.current.readyState !== WebSocket.OPEN}
-          className={`w-full py-2 px-4 rounded-md ${
-            wsRef.current?.readyState === WebSocket.OPEN
-              ? 'bg-blue-600 hover:bg-blue-700 text-white'
-              : 'bg-gray-300 text-gray-500 cursor-not-allowed'
-          }`}
-        >
-          Start Connection
-        </button>
       </div>
     </div>
   );
