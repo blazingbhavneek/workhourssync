@@ -42,7 +42,7 @@ export default function ClientPage() {
   };
 
   useEffect(() => {
-    const ws = new WebSocket('wss://192.168.3.157:8080');
+    const ws = new WebSocket('wss://proximity-websocket.onrender.com');
     wsRef.current = ws;
 
     ws.onopen = () => {
