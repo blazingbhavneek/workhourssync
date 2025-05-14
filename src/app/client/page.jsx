@@ -36,13 +36,13 @@ export default function ClientPage() {
   const [inputId, setInputId] = useState('');
   const [currentId, setCurrentId] = useState('');
   const [isPinging, setIsPinging] = useState(false);
-  const threshold = 50;
+  const threshold = 20;
 
   const { status, result, rtts, iceState, register, sendPing } = useClient({
     wsUrl: 'wss://proximity-websocket.onrender.com',
     iceServers: iceServers,
     rttThreshold : threshold, 
-    acceptanceThreshold : 20
+    acceptanceThreshold : 50
   });
 
   const handleSetId = () => {

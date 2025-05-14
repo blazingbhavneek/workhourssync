@@ -51,7 +51,7 @@ export default function AdminPage() {
             <span className="font-medium">Nearby Devices:</span>
             {nearbyDevices.map(device => (
               <div key={device.id} className="mt-2">
-                {device.id} - {device.rtt}ms {device.rtt < 50 ? '✅' : '❌'}
+                {device.id} - {device.rtt}ms {device.rtt < 20 ? '✅' : '❌'}
               </div>
             ))}
           </div>
