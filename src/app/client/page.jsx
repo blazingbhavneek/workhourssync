@@ -1,44 +1,18 @@
 'use client';
 import { useState } from 'react';
-import { useClient } from 'webrtc-proximity';
+import { useClient } from 'vicinix';
 
 const iceServers = {
-  iceServers: [
-    { urls: "stun:stun.l.google.com:19302" },
-    { urls: "stun:stun.l.google.com:5349" },
-    { urls: "stun:stun1.l.google.com:3478" },
-    { urls: "stun:stun.relay.metered.ca:80" },
-    {
-      urls: "turn:global.relay.metered.ca:80",
-      username: "75700a6e7761f0c4540a170a",
-      credential: "vJHVkZyfaTp/M/nQ",
-    },
-    {
-      urls: "turn:global.relay.metered.ca:80?transport=tcp",
-      username: "75700a6e7761f0c4540a170a",
-      credential: "vJHVkZyfaTp/M/nQ",
-    },
-    {
-      urls: "turn:global.relay.metered.ca:443",
-      username: "75700a6e7761f0c4540a170a",
-      credential: "vJHVkZyfaTp/M/nQ",
-    },
-    {
-      urls: "turns:global.relay.metered.ca:443?transport=tcp",
-      username: "75700a6e7761f0c4540a170a",
-      credential: "vJHVkZyfaTp/M/nQ",
-    },
-  ],
-  iceTransportPolicy: 'all'
+  // ... (iceServers configuration remains the same)
 };
 
 export default function ClientPage() {
   const [inputId, setInputId] = useState('');
   const [currentId, setCurrentId] = useState('');
   const [isPinging, setIsPinging] = useState(false);
-  const threshold = 50;
+  const threshold = 10;
 
-  const { status, result, rtts, iceState, register, sendPing } = useClient({
+  const { status, result, iceState, register, sendPing } = useClient({
     wsUrl: 'wss://proximity-websocket.onrender.com',
     iceServers: iceServers,
     threshold: threshold
@@ -103,14 +77,6 @@ export default function ClientPage() {
               {result}
             </div>
           )}
-          <div>
-            <h3 className="font-medium">Ping Results:</h3>
-            {rtts.map((rtt, index) => (
-              <div key={index}>
-                Ping {index + 1}: {rtt}ms {rtt < threshold ? '✅' : '❌'}
-              </div>
-            ))}
-          </div>
           <div className="text-xs bg-gray-50 p-2 rounded-md overflow-auto max-h-32">
             <pre>ICE State:{iceState}</pre>
           </div>

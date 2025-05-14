@@ -2881,14 +2881,14 @@ uri-js@^4.2.2:
   dependencies:
     punycode "^2.1.0"
 
+"vicinix@file:../webrtc-proximity":
+  version "1.0.2"
+  resolved "file:../webrtc-proximity"
+
 webidl-conversions@^3.0.0:
   version "3.0.1"
   resolved "https://registry.npmjs.org/webidl-conversions/-/webidl-conversions-3.0.1.tgz"
   integrity sha512-2JAn3z8AR6rjK8Sm8orRC0h/bcl/DqL7tRPdGZ4I1CjdF+EaMLmYxBHyXuKL849eucPFhvBoxMsflfOb8kxaeQ==
-
-"webrtc-proximity@file:../webrtc-proximity":
-  version "1.0.0"
-  resolved "file:../webrtc-proximity"
 
 whatwg-url@^5.0.0:
   version "5.0.0"

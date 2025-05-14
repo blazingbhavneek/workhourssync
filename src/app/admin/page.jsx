@@ -1,5 +1,5 @@
 'use client';
-import { useAdmin } from 'webrtc-proximity';
+import { useAdmin } from 'vicinix';
 
 const iceServers = {
   iceServers: [
