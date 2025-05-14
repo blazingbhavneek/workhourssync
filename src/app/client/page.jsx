@@ -1,6 +1,6 @@
 'use client';
 import { useState } from 'react';
-import { useClient } from 'webrtc-proximity';
+import { useClient } from 'vicinix';
 
 const iceServers = {
   iceServers: [
@@ -41,7 +41,8 @@ export default function ClientPage() {
   const { status, result, rtts, iceState, register, sendPing } = useClient({
     wsUrl: 'wss://proximity-websocket.onrender.com',
     iceServers: iceServers,
-    threshold: threshold
+    rttThreshold : threshold, 
+    acceptanceThreshold : 20
   });
 
   const handleSetId = () => {
@@ -49,16 +50,6 @@ export default function ClientPage() {
       setCurrentId(inputId);
       register(inputId);
     }
-  };
-
-  const sendMultiplePings = async () => {
-    if (isPinging) return;
-    setIsPinging(true);
-    for (let i = 0; i < 10; i++) {
-      sendPing();
-      await new Promise(resolve => setTimeout(resolve, 200));
-    }
-    setIsPinging(false);
   };
 
   return (
@@ -88,7 +79,7 @@ export default function ClientPage() {
             <span className="font-medium">Current ID:</span> {currentId || 'Not set'}
           </div>
           <button
-            onClick={sendMultiplePings}
+            onClick={sendPing}
             disabled={!currentId || isPinging}
             className={`w-full py-2 px-4 rounded-md ${
               currentId && !isPinging ? 'bg-green-600 hover:bg-green-700 text-white' : 'bg-gray-300 text-gray-500 cursor-not-allowed'
